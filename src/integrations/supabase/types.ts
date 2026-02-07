@@ -126,6 +126,7 @@ export type Database = {
           no_button_variants: string[] | null
           password_hash: string | null
           password_protected: boolean
+          photo_display_mode: string | null
           slug: string
           subtext: string | null
           success_headline: string | null
@@ -153,6 +154,7 @@ export type Database = {
           no_button_variants?: string[] | null
           password_hash?: string | null
           password_protected?: boolean
+          photo_display_mode?: string | null
           slug: string
           subtext?: string | null
           success_headline?: string | null
@@ -180,6 +182,7 @@ export type Database = {
           no_button_variants?: string[] | null
           password_hash?: string | null
           password_protected?: boolean
+          photo_display_mode?: string | null
           slug?: string
           subtext?: string | null
           success_headline?: string | null
