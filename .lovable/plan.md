@@ -1,116 +1,99 @@
 
 
-# Personal Photo Background Feature with 5MB Limit
+# Photo Display Options & Visibility Improvements
 
 ## Overview
-Add the ability for site creators to upload up to 4 personal photos (max 5MB each) that will be displayed as a subtle background collage on their valentine site. The photos will also appear in the preview when the feature is enabled.
+This plan adds options for controlling when photos are displayed (background vs. after clicking "Yes") and significantly improves photo visibility by reducing/removing the tint, blur, and overlay effects.
 
 ---
 
 ## What You Will Get
-- A new "Personal Photos" section in the site creator form with:
-  - Toggle to enable/disable photo backgrounds
-  - Upload area for up to 4 photos (max 5MB per photo)
-  - Clear file size validation with error messages
-  - Preview thumbnails with ability to remove photos
-- Photos displayed as a semi-transparent background in the actual valentine site
-- Real-time preview showing your uploaded photos
+
+1. **New Display Mode Option** - Choose when photos appear:
+   - "Background" - Photos show behind the main content (current behavior)
+   - "After Yes" - Photos appear only after the visitor clicks "Yes"
+
+2. **Clearer Photo Display** - Improved visibility:
+   - Remove blur effect from photos
+   - Increase opacity from 20% to 60-80%
+   - Remove dark overlay gradients
+   - Keep subtle rotation for collage aesthetic
+   - Optional: Add a light frame/border for definition
 
 ---
 
 ## Technical Implementation
 
-### 1. Database Changes
-Add a new column to store photo URLs:
-
-```sql
-ALTER TABLE public.valentine_sites
-ADD COLUMN background_photos text[] DEFAULT NULL;
-```
-
-### 2. Storage Setup
-Create a storage bucket for photos:
-
-```sql
--- Create bucket for valentine photos
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('valentine-photos', 'valentine-photos', true);
-
--- RLS policies for the bucket
-CREATE POLICY "Authenticated users can upload photos"
-ON storage.objects FOR INSERT
-TO authenticated
-WITH CHECK (bucket_id = 'valentine-photos');
-
-CREATE POLICY "Anyone can view photos"
-ON storage.objects FOR SELECT
-USING (bucket_id = 'valentine-photos');
-
-CREATE POLICY "Users can delete their own photos"
-ON storage.objects FOR DELETE
-TO authenticated
-USING (bucket_id = 'valentine-photos' AND auth.uid()::text = (storage.foldername(name))[1]);
-```
-
-### 3. New Component: PhotoUploadConfig
-Create a new component for the photo upload UI with 5MB validation:
-
-**Location**: `src/components/PhotoUploadConfig.tsx`
-
-**Key Features**:
-- Toggle switch to enable background photos
-- Drag-and-drop or click-to-upload area
-- **5MB file size limit per photo** with clear error messaging
-- Maximum 4 photos limit
-- Image type validation (JPEG, PNG, WebP, GIF only)
-- Grid of uploaded photo thumbnails with delete buttons
-- Upload progress indicator
-
-**File Size Validation Logic**:
-```typescript
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
-const MAX_PHOTOS = 4;
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-
-const validateFile = (file: File) => {
-  if (file.size > MAX_FILE_SIZE) {
-    toast.error(`"${file.name}" is too large. Maximum size is 5MB.`);
-    return false;
-  }
-  if (!ALLOWED_TYPES.includes(file.type)) {
-    toast.error(`"${file.name}" is not a supported image type.`);
-    return false;
-  }
-  return true;
-};
-```
-
-### 4. Update SiteConfig Interface
-Add new fields to the configuration in CreateSite.tsx and EditSite.tsx:
+### 1. Update SiteConfig Interface
+Add a new field to control photo display timing:
 
 ```typescript
 interface SiteConfig {
   // ... existing fields
   enableBackgroundPhotos: boolean;
-  backgroundPhotos: string[]; // Array of photo URLs (max 4)
+  backgroundPhotos: string[];
+  photoDisplayMode: "background" | "after_yes"; // NEW
 }
 ```
 
-### 5. Update Template Components
-Modify each template to render background photos:
-- ClassicPreview.tsx
-- MemeGifPreview.tsx  
-- TeddyBearPreview.tsx
+### 2. Database Migration
+Add a new column to store the display mode preference:
 
-**Background Photo Display**:
-- 2x2 grid layout behind main content
-- Low opacity (15-25%) for readability
-- Slight blur effect for depth
-- Subtle animation between photos (optional)
+```sql
+ALTER TABLE public.valentine_sites
+ADD COLUMN photo_display_mode text DEFAULT 'background';
+```
 
-### 6. Update ValentineSite.tsx
-- Fetch `background_photos` from the database
-- Pass photos to TemplatePreview component
+### 3. Update PhotoUploadConfig Component
+Add radio buttons or a select dropdown for choosing display mode:
+
+- Add a new prop `displayMode` and `onDisplayModeChange`
+- Show two options with clear icons/descriptions:
+  - **Background**: "Show as subtle background behind content"
+  - **After Saying Yes**: "Reveal photos after they click Yes"
+
+### 4. Update PhotoBackground Component
+Improve visibility by changing styling:
+
+**Current (hard to see):**
+```tsx
+className="w-full h-full object-cover opacity-20 blur-[2px]"
+// + overlay gradient
+```
+
+**Updated (clearly visible):**
+```tsx
+className="w-full h-full object-cover opacity-70"
+// No blur, no dark overlay
+// Add subtle white border/shadow for definition
+```
+
+### 5. Create PhotoGallery Component (for "After Yes" mode)
+A new component that displays photos prominently in the success state:
+
+- 2x2 grid layout with proper spacing
+- Full opacity, no blur
+- Subtle shadow and rounded corners
+- Optional: Simple fade-in animation
+
+### 6. Update All Template Components
+Modify ClassicPreview, MemeGifPreview, and TeddyBearPreview to:
+
+- Accept new `photoDisplayMode` prop
+- Conditionally render PhotoBackground (background mode) or PhotoGallery (after_yes mode)
+- Pass the prop through from TemplatePreview
+
+### 7. Update TemplatePreview Interface
+Add the new prop to the interface and pass it through to templates.
+
+### 8. Update CreateSite.tsx and EditSite.tsx
+- Add display mode to initial config state
+- Pass display mode to PhotoUploadConfig
+- Include in database save/load operations
+
+### 9. Update ValentineSite.tsx
+- Fetch `photo_display_mode` from database
+- Pass to TemplatePreview
 
 ---
 
@@ -118,35 +101,56 @@ Modify each template to render background photos:
 
 | File | Change |
 |------|--------|
-| Database migration | Add `background_photos` column + create storage bucket |
-| `src/components/PhotoUploadConfig.tsx` | NEW - Photo upload UI with 5MB validation |
-| `src/pages/CreateSite.tsx` | Add PhotoUploadConfig section, handle uploads |
-| `src/pages/EditSite.tsx` | Add PhotoUploadConfig section, handle uploads |
-| `src/components/TemplatePreview.tsx` | Pass backgroundPhotos prop |
-| `src/components/templates/ClassicPreview.tsx` | Render background photos |
-| `src/components/templates/MemeGifPreview.tsx` | Render background photos |
-| `src/components/templates/TeddyBearPreview.tsx` | Render background photos |
-| `src/pages/ValentineSite.tsx` | Fetch and pass background photos |
+| Database migration | Add `photo_display_mode` column |
+| `src/components/PhotoUploadConfig.tsx` | Add display mode selector, improve PhotoBackground visibility |
+| `src/components/TemplatePreview.tsx` | Add `photoDisplayMode` prop, pass to templates |
+| `src/components/templates/ClassicPreview.tsx` | Handle both display modes |
+| `src/components/templates/MemeGifPreview.tsx` | Handle both display modes |
+| `src/components/templates/TeddyBearPreview.tsx` | Handle both display modes |
+| `src/pages/CreateSite.tsx` | Add display mode config, UI, and save logic |
+| `src/pages/EditSite.tsx` | Add display mode config, UI, and load/save logic |
+| `src/pages/ValentineSite.tsx` | Fetch and pass display mode |
+
+---
+
+## Visual Changes
+
+### PhotoBackground Component (for Background mode)
+**Before:**
+- 20% opacity
+- 2px blur
+- Dark gradient overlay
+- Photos barely visible
+
+**After:**
+- 60-70% opacity
+- No blur
+- No dark overlay
+- Subtle white/light border on each photo
+- Photos clearly visible but still complement content
+
+### PhotoGallery Component (for After Yes mode)
+- Full size photo grid
+- 100% opacity
+- Clean white borders
+- Prominent placement in success screen
+- Appears alongside success message
 
 ---
 
 ## User Experience Flow
 
-1. **Creator opens site editor** and sees a new "Personal Photos" section
-2. **Toggles on** the background photos feature
-3. **Uploads photos** by clicking or dragging (up to 4 photos, max 5MB each)
-4. **If file is too large**, sees a clear error: "photo.jpg is too large. Maximum size is 5MB."
-5. **Sees preview update** with their photos as a subtle background
-6. **Saves/publishes** the site
-7. **Visitor sees** the valentine site with the personal photos in the background
+### Background Mode:
+1. User enables background photos
+2. Selects "Show in Background"
+3. Uploads photos
+4. Preview shows photos clearly behind content
+5. Visitor sees photos immediately when viewing the site
 
----
-
-## Validation Rules Summary
-
-| Rule | Value |
-|------|-------|
-| Maximum photos | 4 |
-| Maximum file size per photo | 5MB |
-| Allowed file types | JPEG, PNG, WebP, GIF |
+### After Yes Mode:
+1. User enables background photos
+2. Selects "Show After Saying Yes"
+3. Uploads photos
+4. Preview shows photos in success state only
+5. Visitor sees clean site initially, photos revealed as a "surprise" after clicking Yes
 
