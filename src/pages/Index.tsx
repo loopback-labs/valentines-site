@@ -42,7 +42,7 @@ export default function Index() {
           </div>
 
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6">
-            <span className="text-gradient-love bg-clip-text">Valentine Maker</span>
+            <span className="text-gradient-love bg-clip-text">Love Link</span>
           </h1>
 
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
@@ -68,26 +68,16 @@ export default function Index() {
                 </Link>
               </Button>
             ) : (
-              <>
-                <Button
-                  asChild
-                  size="lg"
-                  className="h-14 px-8 text-lg bg-gradient-love hover:opacity-90 glow-pink hover-grow"
-                >
-                  <Link to="/auth">
-                    <Sparkles className="w-5 h-5 mr-2" />
-                    Create Your Site
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  variant="outline"
-                  size="lg"
-                  className="h-14 px-8 text-lg hover-grow"
-                >
-                  <Link to="/auth">Sign In</Link>
-                </Button>
-              </>
+              <Button
+                asChild
+                size="lg"
+                className="h-14 px-8 text-lg bg-gradient-love hover:opacity-90 glow-pink hover-grow"
+              >
+                <Link to="/auth">
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  Create Your Site
+                </Link>
+              </Button>
             )}
           </div>
 
@@ -119,7 +109,7 @@ export default function Index() {
       <section className="py-20 px-4 bg-muted/30">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Why Choose Valentine Maker?
+            Why Choose Love Link?
           </h2>
           <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
             The easiest way to create a fun, shareable Valentine's message
@@ -188,7 +178,7 @@ export default function Index() {
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Heart className="w-6 h-6 text-primary" fill="currentColor" />
-            <span className="font-semibold">Valentine Maker</span>
+            <span className="font-semibold">Love Link</span>
           </div>
           <p className="text-sm text-muted-foreground">
             Made with 💕 for spreading love
