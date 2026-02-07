@@ -77,9 +77,7 @@ export default function Index() {
                 </span>
               </div>
             </div>
-            <p className="text-sm text-muted-foreground mt-4">
-              👆 The "No" button runs away when you try to click it!
-            </p>
+            
           </div>
         </div>
       </section>
