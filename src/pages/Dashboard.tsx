@@ -104,6 +104,15 @@ export default function Dashboard() {
           </Link>
 
           <div className="flex items-center gap-4">
+            <a 
+              href="https://crush-scale.lovable.app/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-sm text-muted-foreground hover:text-primary transition-colors hidden sm:flex items-center gap-1"
+            >
+              <Heart className="w-4 h-4" />
+              Love Calculator
+            </a>
             <span className="text-sm text-muted-foreground hidden sm:block">
               {user.email}
             </span>
