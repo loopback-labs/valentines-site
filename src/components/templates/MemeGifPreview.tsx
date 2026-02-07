@@ -7,6 +7,8 @@ interface MemeGifPreviewProps {
     subtext: string;
     yesButtonText: string;
     noButtonText: string;
+    successHeadline?: string;
+    successSubtext?: string;
     theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
   };
   isLive?: boolean;
@@ -136,10 +138,10 @@ export default function MemeGifPreview({ config, isLive = false, onYesClick }: M
             />
           </div>
           <h1 className={`text-2xl md:text-3xl font-bold ${styles.text} mb-2`}>
-            Yay! 🎉
+            {config.successHeadline || "Yay! 🎉"}
           </h1>
           <p className={`text-lg ${styles.subtext}`}>
-            I knew you'd say yes! See you soon! 💕
+            {config.successSubtext || "I knew you'd say yes! See you soon! 💕"}
           </p>
         </div>
       </div>

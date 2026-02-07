@@ -20,6 +20,8 @@ interface SiteConfig {
   subtext: string;
   yesButtonText: string;
   noButtonText: string;
+  successHeadline: string;
+  successSubtext: string;
   theme: Theme;
   slug: string;
 }
@@ -45,6 +47,8 @@ export default function CreateSite() {
     subtext: "I really like you... 💕",
     yesButtonText: "Yes! 💕",
     noButtonText: "No",
+    successHeadline: "Yay! 🎉",
+    successSubtext: "I knew you'd say yes! 💕",
     theme: "cute",
     slug: "",
   });
@@ -256,6 +260,30 @@ export default function CreateSite() {
                     onChange={(e) => setConfig({ ...config, noButtonText: e.target.value })}
                     placeholder="No"
                   />
+                </div>
+              </div>
+              {/* Success State Text */}
+              <div className="pt-3 border-t border-border">
+                <p className="text-sm text-muted-foreground mb-3">After clicking "Yes":</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="success-headline">Success Headline</Label>
+                    <Input
+                      id="success-headline"
+                      value={config.successHeadline}
+                      onChange={(e) => setConfig({ ...config, successHeadline: e.target.value })}
+                      placeholder="Yay! 🎉"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="success-subtext">Success Message</Label>
+                    <Input
+                      id="success-subtext"
+                      value={config.successSubtext}
+                      onChange={(e) => setConfig({ ...config, successSubtext: e.target.value })}
+                      placeholder="I knew you'd say yes! 💕"
+                    />
+                  </div>
                 </div>
               </div>
             </CardContent>
