@@ -1,156 +1,179 @@
 
 
-# Photo Display Options & Visibility Improvements
+# Payment Gateway Integration for Love Link
 
 ## Overview
-This plan adds options for controlling when photos are displayed (background vs. after clicking "Yes") and significantly improves photo visibility by reducing/removing the tint, blur, and overlay effects.
+This plan adds a one-time payment system using Stripe to unlock premium features. Free users can create **1 site without photo uploads**, while paid users get **unlimited sites with photo uploads**.
 
 ---
 
 ## What You Will Get
 
-1. **New Display Mode Option** - Choose when photos appear:
-   - "Background" - Photos show behind the main content (current behavior)
-   - "After Yes" - Photos appear only after the visitor clicks "Yes"
+### Free Tier
+- Create 1 Valentine site
+- No photo upload feature
+- All templates and themes available
 
-2. **Clearer Photo Display** - Improved visibility:
-   - Remove blur effect from photos
-   - Increase opacity from 20% to 60-80%
-   - Remove dark overlay gradients
-   - Keep subtle rotation for collage aesthetic
-   - Optional: Add a light frame/border for definition
-
----
-
-## Technical Implementation
-
-### 1. Update SiteConfig Interface
-Add a new field to control photo display timing:
-
-```typescript
-interface SiteConfig {
-  // ... existing fields
-  enableBackgroundPhotos: boolean;
-  backgroundPhotos: string[];
-  photoDisplayMode: "background" | "after_yes"; // NEW
-}
-```
-
-### 2. Database Migration
-Add a new column to store the display mode preference:
-
-```sql
-ALTER TABLE public.valentine_sites
-ADD COLUMN photo_display_mode text DEFAULT 'background';
-```
-
-### 3. Update PhotoUploadConfig Component
-Add radio buttons or a select dropdown for choosing display mode:
-
-- Add a new prop `displayMode` and `onDisplayModeChange`
-- Show two options with clear icons/descriptions:
-  - **Background**: "Show as subtle background behind content"
-  - **After Saying Yes**: "Reveal photos after they click Yes"
-
-### 4. Update PhotoBackground Component
-Improve visibility by changing styling:
-
-**Current (hard to see):**
-```tsx
-className="w-full h-full object-cover opacity-20 blur-[2px]"
-// + overlay gradient
-```
-
-**Updated (clearly visible):**
-```tsx
-className="w-full h-full object-cover opacity-70"
-// No blur, no dark overlay
-// Add subtle white border/shadow for definition
-```
-
-### 5. Create PhotoGallery Component (for "After Yes" mode)
-A new component that displays photos prominently in the success state:
-
-- 2x2 grid layout with proper spacing
-- Full opacity, no blur
-- Subtle shadow and rounded corners
-- Optional: Simple fade-in animation
-
-### 6. Update All Template Components
-Modify ClassicPreview, MemeGifPreview, and TeddyBearPreview to:
-
-- Accept new `photoDisplayMode` prop
-- Conditionally render PhotoBackground (background mode) or PhotoGallery (after_yes mode)
-- Pass the prop through from TemplatePreview
-
-### 7. Update TemplatePreview Interface
-Add the new prop to the interface and pass it through to templates.
-
-### 8. Update CreateSite.tsx and EditSite.tsx
-- Add display mode to initial config state
-- Pass display mode to PhotoUploadConfig
-- Include in database save/load operations
-
-### 9. Update ValentineSite.tsx
-- Fetch `photo_display_mode` from database
-- Pass to TemplatePreview
-
----
-
-## File Changes Summary
-
-| File | Change |
-|------|--------|
-| Database migration | Add `photo_display_mode` column |
-| `src/components/PhotoUploadConfig.tsx` | Add display mode selector, improve PhotoBackground visibility |
-| `src/components/TemplatePreview.tsx` | Add `photoDisplayMode` prop, pass to templates |
-| `src/components/templates/ClassicPreview.tsx` | Handle both display modes |
-| `src/components/templates/MemeGifPreview.tsx` | Handle both display modes |
-| `src/components/templates/TeddyBearPreview.tsx` | Handle both display modes |
-| `src/pages/CreateSite.tsx` | Add display mode config, UI, and save logic |
-| `src/pages/EditSite.tsx` | Add display mode config, UI, and load/save logic |
-| `src/pages/ValentineSite.tsx` | Fetch and pass display mode |
-
----
-
-## Visual Changes
-
-### PhotoBackground Component (for Background mode)
-**Before:**
-- 20% opacity
-- 2px blur
-- Dark gradient overlay
-- Photos barely visible
-
-**After:**
-- 60-70% opacity
-- No blur
-- No dark overlay
-- Subtle white/light border on each photo
-- Photos clearly visible but still complement content
-
-### PhotoGallery Component (for After Yes mode)
-- Full size photo grid
-- 100% opacity
-- Clean white borders
-- Prominent placement in success screen
-- Appears alongside success message
+### Premium Tier (One-time Payment)
+- Unlimited Valentine sites
+- Photo upload feature enabled
+- Priority support badge (optional future addition)
 
 ---
 
 ## User Experience Flow
 
-### Background Mode:
-1. User enables background photos
-2. Selects "Show in Background"
-3. Uploads photos
-4. Preview shows photos clearly behind content
-5. Visitor sees photos immediately when viewing the site
+```text
++-------------------+
+| User signs up     |
++-------------------+
+         |
+         v
++-------------------+
+| Free tier active  |
+| - 1 site allowed  |
+| - No photos       |
++-------------------+
+         |
+         v
++---------------------------+
+| Tries to:                 |
+| - Create 2nd site    OR   |
+| - Upload photos           |
++---------------------------+
+         |
+         v
++-------------------+
+| Upgrade modal     |
+| "Unlock Premium"  |
++-------------------+
+         |
+         v
++-------------------+
+| Stripe Checkout   |
++-------------------+
+         |
+         v
++-------------------+
+| Payment success   |
+| Premium unlocked! |
++-------------------+
+```
 
-### After Yes Mode:
-1. User enables background photos
-2. Selects "Show After Saying Yes"
-3. Uploads photos
-4. Preview shows photos in success state only
-5. Visitor sees clean site initially, photos revealed as a "surprise" after clicking Yes
+---
+
+## Technical Implementation
+
+### 1. Enable Stripe Integration
+Use Lovable's built-in Stripe integration to handle payments securely. This will:
+- Set up secure payment processing
+- Handle webhooks automatically
+- Store payment status in the database
+
+### 2. Database Changes
+
+**Add `is_premium` column to profiles table:**
+```sql
+ALTER TABLE public.profiles
+ADD COLUMN is_premium boolean DEFAULT false NOT NULL;
+```
+
+**Add RLS policy for premium status:**
+```sql
+-- Users can read their own premium status
+CREATE POLICY "Users can read own premium status"
+ON public.profiles FOR SELECT
+USING (auth.uid() = user_id);
+```
+
+### 3. Create Stripe Product & Price
+Configure a one-time payment product in Stripe:
+- Product: "Love Link Premium"
+- Price: $X.XX (you can set the price)
+- Type: One-time payment
+
+### 4. Create Edge Functions
+
+**`create-checkout-session` Edge Function:**
+- Creates a Stripe Checkout session for premium upgrade
+- Returns checkout URL to redirect user
+- Includes user metadata for webhook processing
+
+**`stripe-webhook` Edge Function:**
+- Listens for `checkout.session.completed` events
+- Updates `profiles.is_premium = true` for the user
+- Handles payment confirmation securely
+
+### 5. Frontend Changes
+
+**Update AuthContext:**
+- Add `isPremium` to the context
+- Fetch premium status from profiles table
+- Provide throughout the app
+
+**Create Upgrade Modal Component:**
+- Beautiful modal showing premium benefits
+- One-click upgrade button
+- Redirects to Stripe Checkout
+
+**Update CreateSite.tsx:**
+- Check site count before allowing creation
+- If user has 1+ sites and is not premium, show upgrade modal
+- Block "Create New" button with upgrade CTA
+
+**Update PhotoUploadConfig.tsx:**
+- Check premium status before allowing photo uploads
+- Show upgrade prompt if not premium
+- Disable upload functionality for free users
+
+**Update Dashboard.tsx:**
+- Show premium badge for paid users
+- Add "Upgrade to Premium" button for free users
+- Display current tier status
+
+### 6. File Changes Summary
+
+| File | Change |
+|------|--------|
+| Database migration | Add `is_premium` column to profiles |
+| `supabase/functions/create-checkout-session/index.ts` | Create Stripe checkout session |
+| `supabase/functions/stripe-webhook/index.ts` | Handle payment confirmation |
+| `src/contexts/AuthContext.tsx` | Add `isPremium` state |
+| `src/components/UpgradeModal.tsx` | New component for upgrade prompt |
+| `src/components/PhotoUploadConfig.tsx` | Gate behind premium |
+| `src/pages/CreateSite.tsx` | Limit to 1 site for free users |
+| `src/pages/Dashboard.tsx` | Show premium status & upgrade CTA |
+
+---
+
+## Security Considerations
+
+1. **Server-side validation**: Premium status is checked via database, not client-side
+2. **Webhook signature verification**: Stripe webhooks are verified before processing
+3. **RLS policies**: Only users can read their own premium status
+4. **No exposed secrets**: All Stripe operations happen in edge functions
+
+---
+
+## Premium Feature Gates
+
+| Feature | Free | Premium |
+|---------|------|---------|
+| Create sites | 1 | Unlimited |
+| Photo uploads | No | Yes |
+| All templates | Yes | Yes |
+| All themes | Yes | Yes |
+| Date planning | Yes | Yes |
+| Password protection | Yes | Yes |
+
+---
+
+## Next Steps After Implementation
+
+1. Set your preferred price for premium
+2. Test the complete payment flow
+3. Consider adding:
+   - Email confirmation for purchases
+   - Premium user analytics
+   - Referral discounts
 
