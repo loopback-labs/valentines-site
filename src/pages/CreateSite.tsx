@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heart, ArrowLeft, Sparkles, Monitor, Smartphone, Check, Loader2, CalendarDays, ImagePlus } from "lucide-react";
@@ -379,11 +380,16 @@ export default function CreateSite() {
 
         {/* Personal Photos Section */}
         <Card className="mb-8">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg flex items-center gap-2">
               <ImagePlus className="w-5 h-5" />
               📷 Memories (Optional)
             </CardTitle>
+            <Switch 
+              id="photo-bg-toggle" 
+              checked={config.enableBackgroundPhotos} 
+              onCheckedChange={(enabled) => setConfig({ ...config, enableBackgroundPhotos: enabled })} 
+            />
           </CardHeader>
           <CardContent>
             <PhotoUploadConfig
