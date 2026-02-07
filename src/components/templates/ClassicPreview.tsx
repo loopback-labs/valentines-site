@@ -2,8 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { Heart } from "lucide-react";
 import DatePlanningForm, { DatePreferences } from "@/components/DatePlanningForm";
 import { DatePlanningConfig } from "@/components/TemplatePreview";
-import { PhotoBackground, PhotoGallery } from "@/components/PhotoUploadConfig";
-import { PhotoDisplayMode } from "@/components/PhotoUploadConfig";
 
 interface ValentinePreviewProps {
   config: {
@@ -16,8 +14,6 @@ interface ValentinePreviewProps {
     theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
   };
   datePlanningConfig?: DatePlanningConfig;
-  backgroundPhotos?: string[];
-  photoDisplayMode?: PhotoDisplayMode;
   isLive?: boolean;
   onYesClick?: () => void;
   onDateFormSubmit?: (preferences: DatePreferences) => Promise<void>;
@@ -83,8 +79,6 @@ const themeStyles = {
 export default function ValentinePreview({ 
   config, 
   datePlanningConfig,
-  backgroundPhotos,
-  photoDisplayMode = "background",
   isLive = false, 
   onYesClick,
   onDateFormSubmit,
@@ -142,6 +136,7 @@ export default function ValentinePreview({
   }, [config.theme]);
 
   const showDatePlanningForm = datePlanningConfig?.enableDatePlanning && 
+    datePlanningConfig.availableDates.length > 0 &&
     datePlanningConfig.timeSlots.length > 0;
   
   const handleDateFormSubmit = onDateFormSubmit || (async () => {
@@ -150,15 +145,8 @@ export default function ValentinePreview({
   });
 
   if (showSuccess) {
-    const showPhotosAfterYes = photoDisplayMode === "after_yes" && backgroundPhotos && backgroundPhotos.length > 0;
-    const showPhotosInBackground = photoDisplayMode === "background" && backgroundPhotos && backgroundPhotos.length > 0;
-    
     return (
       <div className={`h-full flex flex-col items-center justify-center p-8 ${styles.bg} relative overflow-hidden`}>
-        {/* Background Photos - only in background mode */}
-        {showPhotosInBackground && (
-          <PhotoBackground photos={backgroundPhotos} />
-        )}
         {/* Confetti */}
         {[...Array(30)].map((_, i) => (
           <div
@@ -187,13 +175,9 @@ export default function ValentinePreview({
             {config.successSubtext || "I knew you'd say yes! 💕"}
           </p>
 
-          {/* Photo Gallery - only in after_yes mode */}
-          {showPhotosAfterYes && (
-            <PhotoGallery photos={backgroundPhotos} className="mb-6" />
-          )}
-
           {showDatePlanningForm && (
             <DatePlanningForm
+              availableDates={datePlanningConfig.availableDates}
               timeSlots={datePlanningConfig.timeSlots}
               foodOptions={datePlanningConfig.foodOptions}
               activityOptions={datePlanningConfig.activityOptions}
@@ -206,17 +190,11 @@ export default function ValentinePreview({
     );
   }
 
-  const showPhotosInBackground = photoDisplayMode === "background" && backgroundPhotos && backgroundPhotos.length > 0;
-
   return (
     <div
       ref={containerRef}
       className={`h-full flex flex-col items-center justify-center p-8 ${styles.bg} relative overflow-hidden`}
     >
-      {/* Background Photos - only in background mode */}
-      {showPhotosInBackground && (
-        <PhotoBackground photos={backgroundPhotos} />
-      )}
       {/* Floating hearts for cute/chaotic themes */}
       {(config.theme === "cute" || config.theme === "chaotic") && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
