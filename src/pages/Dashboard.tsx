@@ -89,6 +89,7 @@ export default function Dashboard() {
   const templateLabels: Record<string, { name: string; emoji: string }> = {
     classic: { name: "Classic", emoji: "💕" },
     meme_gif: { name: "Meme GIF", emoji: "🐱" },
+    teddy_bear: { name: "Teddy Bear", emoji: "🧸" },
   };
 
   return (

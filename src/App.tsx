@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import CreateSite from "./pages/CreateSite";
+import EditSite from "./pages/EditSite";
 import ValentineSite from "./pages/ValentineSite";
 import NotFound from "./pages/NotFound";
 
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/create" element={<CreateSite />} />
+            <Route path="/edit/:id" element={<EditSite />} />
             <Route path="/:slug" element={<ValentineSite />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
