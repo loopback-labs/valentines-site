@@ -2,7 +2,8 @@ import { useState, useRef, useCallback } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { ImagePlus, X, Upload, Loader2 } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ImagePlus, X, Upload, Loader2, Image, PartyPopper } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,11 +12,15 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
 const MAX_PHOTOS = 4;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
+export type PhotoDisplayMode = "background" | "after_yes";
+
 interface PhotoUploadConfigProps {
   enabled: boolean;
   onEnabledChange: (enabled: boolean) => void;
   photos: string[];
   onPhotosChange: (photos: string[]) => void;
+  displayMode: PhotoDisplayMode;
+  onDisplayModeChange: (mode: PhotoDisplayMode) => void;
 }
 
 export function PhotoUploadConfig({
@@ -23,6 +28,8 @@ export function PhotoUploadConfig({
   onEnabledChange,
   photos,
   onPhotosChange,
+  displayMode,
+  onDisplayModeChange,
 }: PhotoUploadConfigProps) {
   const { user } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
@@ -153,7 +160,57 @@ export function PhotoUploadConfig({
       </div>
 
       {enabled && (
-        <div className="space-y-4 pt-2">
+        <div className="space-y-6 pt-2">
+          {/* Display Mode Selector */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium">When to show photos</Label>
+            <RadioGroup
+              value={displayMode}
+              onValueChange={(value) => onDisplayModeChange(value as PhotoDisplayMode)}
+              className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+            >
+              <Label
+                htmlFor="mode-background"
+                className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                  displayMode === "background"
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/50"
+                }`}
+              >
+                <RadioGroupItem value="background" id="mode-background" className="mt-0.5" />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 font-medium">
+                    <Image className="w-4 h-4" />
+                    Background
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Show photos behind content immediately
+                  </p>
+                </div>
+              </Label>
+              <Label
+                htmlFor="mode-after-yes"
+                className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                  displayMode === "after_yes"
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/50"
+                }`}
+              >
+                <RadioGroupItem value="after_yes" id="mode-after-yes" className="mt-0.5" />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 font-medium">
+                    <PartyPopper className="w-4 h-4" />
+                    After Saying Yes
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Reveal photos as a surprise after they click Yes
+                  </p>
+                </div>
+              </Label>
+            </RadioGroup>
+          </div>
+
+          <div className="space-y-4">
           {/* Upload Area */}
           {photos.length < MAX_PHOTOS && (
             <div
@@ -240,11 +297,12 @@ export function PhotoUploadConfig({
             </div>
           )}
 
-          {photos.length > 0 && (
-            <p className="text-xs text-muted-foreground">
-              {photos.length} of {MAX_PHOTOS} photos added
-            </p>
-          )}
+            {photos.length > 0 && (
+              <p className="text-xs text-muted-foreground">
+                {photos.length} of {MAX_PHOTOS} photos added
+              </p>
+            )}
+          </div>
         </div>
       )}
     </div>
@@ -262,11 +320,11 @@ export function PhotoBackground({ photos, className = "" }: PhotoBackgroundProps
 
   return (
     <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}>
-      <div className="absolute inset-0 grid grid-cols-2 gap-2 p-4">
+      <div className="absolute inset-0 grid grid-cols-2 gap-3 p-4">
         {photos.slice(0, 4).map((photo, index) => (
           <div
             key={photo}
-            className="relative overflow-hidden rounded-lg"
+            className="relative overflow-hidden rounded-xl shadow-lg ring-2 ring-white/30"
             style={{
               transform: `rotate(${(index % 2 === 0 ? -1 : 1) * (2 + index)}deg)`,
             }}
@@ -274,13 +332,43 @@ export function PhotoBackground({ photos, className = "" }: PhotoBackgroundProps
             <img
               src={photo}
               alt=""
-              className="w-full h-full object-cover opacity-20 blur-[2px]"
+              className="w-full h-full object-cover opacity-70"
             />
           </div>
         ))}
       </div>
-      {/* Overlay gradient for better text readability */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/10" />
+    </div>
+  );
+}
+
+// Photo Gallery Component for "After Yes" mode - displays prominently in success state
+interface PhotoGalleryProps {
+  photos: string[];
+  className?: string;
+}
+
+export function PhotoGallery({ photos, className = "" }: PhotoGalleryProps) {
+  if (!photos || photos.length === 0) return null;
+
+  return (
+    <div className={`w-full max-w-sm mx-auto ${className}`}>
+      <div className="grid grid-cols-2 gap-3">
+        {photos.slice(0, 4).map((photo, index) => (
+          <div
+            key={photo}
+            className="relative aspect-square overflow-hidden rounded-xl shadow-lg ring-2 ring-white/40 animate-fade-in"
+            style={{
+              animationDelay: `${index * 0.15}s`,
+            }}
+          >
+            <img
+              src={photo}
+              alt=""
+              className="w-full h-full object-cover"
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import DatePlanningForm, { DatePreferences } from "@/components/DatePlanningForm";
 import { DatePlanningConfig } from "@/components/TemplatePreview";
-import { PhotoBackground } from "@/components/PhotoUploadConfig";
+import { PhotoBackground, PhotoGallery } from "@/components/PhotoUploadConfig";
+import { PhotoDisplayMode } from "@/components/PhotoUploadConfig";
 
 interface TeddyBearPreviewProps {
   config: {
@@ -15,6 +16,7 @@ interface TeddyBearPreviewProps {
   };
   datePlanningConfig?: DatePlanningConfig;
   backgroundPhotos?: string[];
+  photoDisplayMode?: PhotoDisplayMode;
   isLive?: boolean;
   onYesClick?: () => void;
   onDateFormSubmit?: (preferences: DatePreferences) => Promise<void>;
@@ -119,6 +121,7 @@ export default function TeddyBearPreview({
   config, 
   datePlanningConfig,
   backgroundPhotos,
+  photoDisplayMode = "background",
   isLive = false, 
   onYesClick,
   onDateFormSubmit,
@@ -189,10 +192,13 @@ export default function TeddyBearPreview({
   });
 
   if (showSuccess) {
+    const showPhotosAfterYes = photoDisplayMode === "after_yes" && backgroundPhotos && backgroundPhotos.length > 0;
+    const showPhotosInBackground = photoDisplayMode === "background" && backgroundPhotos && backgroundPhotos.length > 0;
+    
     return (
       <div className={`h-full flex flex-col items-center justify-center p-4 ${holoClass} relative overflow-y-auto`}>
-        {/* Background Photos */}
-        {backgroundPhotos && backgroundPhotos.length > 0 && (
+        {/* Background Photos - only in background mode */}
+        {showPhotosInBackground && (
           <PhotoBackground photos={backgroundPhotos} />
         )}
         {/* Marquee text */}
@@ -219,6 +225,11 @@ export default function TeddyBearPreview({
           <p className={`text-xl ${styles.subtext} mb-6`}>
             {config.successSubtext || "I knew you couldn't resist! See you soon! 💕"}
           </p>
+
+          {/* Photo Gallery - only in after_yes mode */}
+          {showPhotosAfterYes && (
+            <PhotoGallery photos={backgroundPhotos} className="mb-6" />
+          )}
 
           {showDatePlanningForm && (
             <DatePlanningForm
@@ -249,10 +260,12 @@ export default function TeddyBearPreview({
     );
   }
 
+  const showPhotosInBackground = photoDisplayMode === "background" && backgroundPhotos && backgroundPhotos.length > 0;
+
   return (
     <div className={`h-full flex flex-col items-center justify-center p-4 ${holoClass} relative overflow-hidden`}>
-      {/* Background Photos */}
-      {backgroundPhotos && backgroundPhotos.length > 0 && (
+      {/* Background Photos - only in background mode */}
+      {showPhotosInBackground && (
         <PhotoBackground photos={backgroundPhotos} />
       )}
       {/* Floating sad GIFs */}
