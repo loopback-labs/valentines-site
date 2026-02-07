@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { Heart } from "lucide-react";
+import DatePlanningForm, { DatePreferences } from "@/components/DatePlanningForm";
+import { DatePlanningConfig } from "@/components/TemplatePreview";
 
 interface MemeGifPreviewProps {
   config: {
@@ -11,8 +13,10 @@ interface MemeGifPreviewProps {
     successSubtext?: string;
     theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
   };
+  datePlanningConfig?: DatePlanningConfig;
   isLive?: boolean;
   onYesClick?: () => void;
+  onDateFormSubmit?: (preferences: DatePreferences) => Promise<void>;
 }
 
 const noButtonVariants = [
@@ -98,7 +102,13 @@ const themeStyles = {
   },
 };
 
-export default function MemeGifPreview({ config, isLive = false, onYesClick }: MemeGifPreviewProps) {
+export default function MemeGifPreview({ 
+  config, 
+  datePlanningConfig,
+  isLive = false, 
+  onYesClick,
+  onDateFormSubmit,
+}: MemeGifPreviewProps) {
   const [noIndex, setNoIndex] = useState(0);
   const [yesScale, setYesScale] = useState(1);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -126,9 +136,12 @@ export default function MemeGifPreview({ config, isLive = false, onYesClick }: M
     setGifState("neutral");
   }, [config.theme]);
 
+  const showDatePlanningForm = datePlanningConfig?.enableDatePlanning && 
+    datePlanningConfig.availableDates.length > 0;
+
   if (showSuccess) {
     return (
-      <div className={`h-full flex flex-col items-center justify-center p-4 ${styles.bg}`}>
+      <div className={`h-full flex flex-col items-center justify-center p-4 ${styles.bg} overflow-y-auto`}>
         <div className={`max-w-md w-full ${styles.card} rounded-2xl p-6 text-center`}>
           <div className="w-48 h-48 mx-auto mb-4 rounded-xl overflow-hidden">
             <img
@@ -140,9 +153,20 @@ export default function MemeGifPreview({ config, isLive = false, onYesClick }: M
           <h1 className={`text-2xl md:text-3xl font-bold ${styles.text} mb-2`}>
             {config.successHeadline || "Yay! 🎉"}
           </h1>
-          <p className={`text-lg ${styles.subtext}`}>
+          <p className={`text-lg ${styles.subtext} mb-6`}>
             {config.successSubtext || "I knew you'd say yes! See you soon! 💕"}
           </p>
+
+          {showDatePlanningForm && onDateFormSubmit && (
+            <DatePlanningForm
+              availableDates={datePlanningConfig.availableDates}
+              timeSlots={datePlanningConfig.timeSlots}
+              foodOptions={datePlanningConfig.foodOptions}
+              activityOptions={datePlanningConfig.activityOptions}
+              onSubmit={onDateFormSubmit}
+              theme={config.theme}
+            />
+          )}
         </div>
       </div>
     );

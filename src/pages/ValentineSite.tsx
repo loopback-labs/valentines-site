@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Heart, Loader2 } from "lucide-react";
 import TemplatePreview from "@/components/TemplatePreview";
 import { TemplateId } from "@/components/TemplateSelector";
+import { DatePreferences } from "@/components/DatePlanningForm";
 
 interface SiteData {
   id: string;
@@ -12,8 +13,15 @@ interface SiteData {
   subtext: string;
   yes_button_text: string;
   no_button_text: string;
+  success_headline: string | null;
+  success_subtext: string | null;
   theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
   password_protected: boolean;
+  enable_date_planning: boolean;
+  available_dates: string[] | null;
+  time_slots: string[] | null;
+  food_options: string[] | null;
+  activity_options: string[] | null;
 }
 
 export default function ValentineSite() {
@@ -81,6 +89,18 @@ export default function ValentineSite() {
     }
   };
 
+  const handleDateFormSubmit = async (preferences: DatePreferences) => {
+    if (!site) return;
+
+    await supabase.from("date_preferences").insert({
+      site_id: site.id,
+      selected_date: preferences.selectedDate.toISOString().split('T')[0],
+      selected_time: preferences.selectedTime,
+      food_preference: preferences.foodPreference,
+      activity_preference: preferences.activityPreference,
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-love">
@@ -103,6 +123,11 @@ export default function ValentineSite() {
 
   if (!site) return null;
 
+  // Parse available dates from string array to Date objects
+  const availableDates = site.available_dates 
+    ? site.available_dates.map(d => new Date(d))
+    : [];
+
   return (
     <div className="h-screen w-screen overflow-hidden">
       <TemplatePreview
@@ -112,10 +137,20 @@ export default function ValentineSite() {
           subtext: site.subtext || "",
           yesButtonText: site.yes_button_text,
           noButtonText: site.no_button_text,
+          successHeadline: site.success_headline || undefined,
+          successSubtext: site.success_subtext || undefined,
           theme: site.theme,
+        }}
+        datePlanningConfig={{
+          enableDatePlanning: site.enable_date_planning,
+          availableDates: availableDates,
+          timeSlots: site.time_slots || [],
+          foodOptions: site.food_options || [],
+          activityOptions: site.activity_options || [],
         }}
         isLive
         onYesClick={handleYesClick}
+        onDateFormSubmit={handleDateFormSubmit}
       />
     </div>
   );
