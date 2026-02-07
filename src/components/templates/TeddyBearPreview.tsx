@@ -6,6 +6,8 @@ interface TeddyBearPreviewProps {
     subtext: string;
     yesButtonText: string;
     noButtonText: string;
+    successHeadline?: string;
+    successSubtext?: string;
     theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
   };
   isLive?: boolean;
@@ -187,10 +189,10 @@ export default function TeddyBearPreview({ config, isLive = false, onYesClick }:
             />
           </div>
           <h1 className={`text-3xl md:text-4xl font-bold ${styles.text} mb-3`}>
-            Yay! You said Yes! 🎉
+            {config.successHeadline || "Yay! You said Yes! 🎉"}
           </h1>
           <p className={`text-xl ${styles.subtext}`}>
-            I knew you couldn't resist! See you soon! 💕
+            {config.successSubtext || "I knew you couldn't resist! See you soon! 💕"}
           </p>
         </div>
 
