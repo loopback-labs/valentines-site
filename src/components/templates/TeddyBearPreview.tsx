@@ -298,7 +298,7 @@ export default function TeddyBearPreview({
         </p>
 
         {/* Buttons */}
-        <div className="flex flex-col items-center justify-center gap-6">
+        <div className="flex flex-col items-center justify-center gap-4">
           <div
             className="flex items-center justify-center transition-all"
             style={{
