@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Heart } from "lucide-react";
 import DatePlanningForm, { DatePreferences } from "@/components/DatePlanningForm";
 import { DatePlanningConfig } from "@/components/TemplatePreview";
+import { PhotoBackground } from "@/components/PhotoUploadConfig";
 
 interface MemeGifPreviewProps {
   config: {
@@ -14,6 +15,7 @@ interface MemeGifPreviewProps {
     theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
   };
   datePlanningConfig?: DatePlanningConfig;
+  backgroundPhotos?: string[];
   isLive?: boolean;
   onYesClick?: () => void;
   onDateFormSubmit?: (preferences: DatePreferences) => Promise<void>;
@@ -105,6 +107,7 @@ const themeStyles = {
 export default function MemeGifPreview({ 
   config, 
   datePlanningConfig,
+  backgroundPhotos,
   isLive = false, 
   onYesClick,
   onDateFormSubmit,
@@ -146,8 +149,12 @@ export default function MemeGifPreview({
 
   if (showSuccess) {
     return (
-      <div className={`h-full flex flex-col items-center justify-center p-4 ${styles.bg} overflow-y-auto`}>
-        <div className={`max-w-md w-full ${styles.card} rounded-2xl p-6 text-center`}>
+      <div className={`h-full flex flex-col items-center justify-center p-4 ${styles.bg} overflow-y-auto relative`}>
+        {/* Background Photos */}
+        {backgroundPhotos && backgroundPhotos.length > 0 && (
+          <PhotoBackground photos={backgroundPhotos} />
+        )}
+        <div className={`max-w-md w-full ${styles.card} rounded-2xl p-6 text-center relative z-10`}>
           <div className="w-48 h-48 mx-auto mb-4 rounded-xl overflow-hidden">
             <img
               src={happyGifsByTheme[config.theme] || happyGifsByTheme.cute}
@@ -187,6 +194,10 @@ export default function MemeGifPreview({
 
   return (
     <div className={`h-full flex flex-col items-center justify-center p-4 ${styles.bg} relative overflow-hidden`}>
+      {/* Background Photos */}
+      {backgroundPhotos && backgroundPhotos.length > 0 && (
+        <PhotoBackground photos={backgroundPhotos} />
+      )}
       {/* Floating Hearts Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(12)].map((_, i) => (
