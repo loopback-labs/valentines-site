@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heart, Plus, Eye, MousePointerClick, LogOut, Sparkles, ExternalLink, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import Footer from "@/components/Footer";
 
 interface ValentineSite {
   id: string;
@@ -284,6 +285,8 @@ export default function Dashboard() {
           </div>
         )}
       </main>
+
+      <Footer />
     </div>
   );
 }
