@@ -31,11 +31,17 @@ const noButtonVariants = [
   "You're breaking my heart ;(",
 ];
 
-// GIF URLs for different states (using placeholder cute cat GIFs)
-const gifStates = {
-  neutral: "https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif", // Cute pleading cat
-  sad: "https://media.giphy.com/media/BEob5qwFkSJ7G/giphy.gif", // Sad cat
+// Theme-specific neutral/default GIFs
+const neutralGifsByTheme: Record<string, string> = {
+  cute: "https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif", // Cute pleading cat
+  minimal: "https://media.giphy.com/media/mlvseq9yvZhba/giphy.gif", // Clean simple cat
+  dark: "https://media.giphy.com/media/VbnUQpnihPSIgIXuZv/giphy.gif", // Mysterious cat
+  pastel: "https://media.giphy.com/media/3oKIPnAiaMCws8nOsE/giphy.gif", // Soft dreamy cat
+  chaotic: "https://media.giphy.com/media/nR4L10XlJcSeQ/giphy.gif", // Crazy energetic cat
 };
+
+// Sad GIF (same for all themes)
+const sadGif = "https://media.giphy.com/media/BEob5qwFkSJ7G/giphy.gif";
 
 // Theme-specific happy/celebration GIFs
 const happyGifsByTheme: Record<string, string> = {
@@ -145,7 +151,7 @@ export default function MemeGifPreview({ config, isLive = false, onYesClick }: M
         {/* GIF Banner */}
         <div className="w-full aspect-square max-w-[200px] mx-auto mb-6 rounded-xl overflow-hidden">
           <img
-            src={gifStates[gifState]}
+            src={gifState === "neutral" ? (neutralGifsByTheme[config.theme] || neutralGifsByTheme.cute) : sadGif}
             alt="Valentine"
             className="w-full h-full object-cover"
           />
