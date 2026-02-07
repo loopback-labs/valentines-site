@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, ArrowLeft, Sparkles, Monitor, Smartphone, Check, Loader2, CalendarDays } from "lucide-react";
+import { Heart, ArrowLeft, Sparkles, Monitor, Smartphone, Check, Loader2, CalendarDays, ImagePlus } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import TemplateSelector, { TemplateId } from "@/components/TemplateSelector";
@@ -17,6 +17,9 @@ import DatePlanningConfig, {
   DEFAULT_ACTIVITY_OPTIONS 
 } from "@/components/DatePlanningConfig";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { PasswordProtectionConfig } from "@/components/PasswordProtection";
+import { PhotoUploadConfig, PhotoDisplayMode } from "@/components/PhotoUploadConfig";
+import { Lock } from "lucide-react";
 
 type Theme = "cute" | "minimal" | "dark" | "pastel" | "chaotic";
 
@@ -31,10 +34,14 @@ interface SiteConfig {
   theme: Theme;
   slug: string;
   enableDatePlanning: boolean;
-  availableDates: Date[];
   timeSlots: string[];
   foodOptions: string[];
   activityOptions: string[];
+  passwordProtected: boolean;
+  password: string;
+  enableBackgroundPhotos: boolean;
+  backgroundPhotos: string[];
+  photoDisplayMode: PhotoDisplayMode;
 }
 
 const themes: { id: Theme; name: string; emoji: string; description: string }[] = [
@@ -64,10 +71,14 @@ export default function CreateSite() {
     theme: "cute",
     slug: "",
     enableDatePlanning: false,
-    availableDates: [],
     timeSlots: [...DEFAULT_TIME_SLOTS],
     foodOptions: [...DEFAULT_FOOD_OPTIONS],
     activityOptions: [...DEFAULT_ACTIVITY_OPTIONS],
+    passwordProtected: false,
+    password: "",
+    enableBackgroundPhotos: false,
+    backgroundPhotos: [],
+    photoDisplayMode: "background",
   });
 
   if (loading) {
@@ -138,14 +149,17 @@ export default function CreateSite() {
       theme: config.theme,
       is_published: publish,
       enable_date_planning: config.enableDatePlanning,
-      available_dates: config.availableDates.length > 0 
-        ? config.availableDates.map(d => d.toISOString().split('T')[0]) 
-        : null,
       time_slots: config.timeSlots,
       food_options: config.foodOptions,
       activity_options: config.activityOptions,
       success_headline: config.successHeadline,
       success_subtext: config.successSubtext,
+      password_protected: config.passwordProtected && config.password.length > 0,
+      password_hash: config.passwordProtected && config.password.length > 0 ? config.password : null,
+      background_photos: config.enableBackgroundPhotos && config.backgroundPhotos.length > 0 
+        ? config.backgroundPhotos 
+        : null,
+      photo_display_mode: config.photoDisplayMode,
     }).select().single();
 
     if (error) {
@@ -203,27 +217,33 @@ export default function CreateSite() {
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Step 1: Template Selection */}
+        {/* Step 1: Template Selection - Horizontal on laptop */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="text-lg">🎨 Choose Template</CardTitle>
           </CardHeader>
           <CardContent>
-            <TemplateSelector
-              selected={config.template}
-              onSelect={(template) => setConfig({ ...config, template })}
-            />
+            <div className="lg:flex lg:gap-4">
+              <TemplateSelector
+                selected={config.template}
+                onSelect={(template) => setConfig({ ...config, template })}
+              />
+            </div>
           </CardContent>
         </Card>
 
-        {/* Top Section: URL and Text */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* URL Slug */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Your URL</CardTitle>
-            </CardHeader>
-            <CardContent>
+        {/* URL & Security Section - Combined */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Lock className="w-5 h-5" />
+              🔗 URL & Security
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* URL Slug */}
+            <div>
+              <Label className="text-sm font-medium mb-2 block">Your URL</Label>
               <div className="flex items-center gap-2">
                 <span className="text-muted-foreground text-sm">/</span>
                 <Input
@@ -239,82 +259,92 @@ export default function CreateSite() {
               <p className="text-xs text-muted-foreground mt-2">
                 This will be your shareable link
               </p>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Text Customization */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">✏️ Text</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+            {/* Password Protection */}
+            <div className="pt-4 border-t border-border">
+              <PasswordProtectionConfig
+                enabled={config.passwordProtected}
+                onEnabledChange={(enabled) => setConfig({ ...config, passwordProtected: enabled })}
+                password={config.password}
+                onPasswordChange={(password) => setConfig({ ...config, password })}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Text Customization */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-lg">✏️ Text</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="headline">Headline</Label>
+                <Input
+                  id="headline"
+                  value={config.headline}
+                  onChange={(e) => setConfig({ ...config, headline: e.target.value })}
+                  placeholder="Will You Be My Valentine?"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="subtext">Subtext</Label>
+                <Input
+                  id="subtext"
+                  value={config.subtext}
+                  onChange={(e) => setConfig({ ...config, subtext: e.target.value })}
+                  placeholder="I really like you..."
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="yes-btn">Yes Button</Label>
+                <Input
+                  id="yes-btn"
+                  value={config.yesButtonText}
+                  onChange={(e) => setConfig({ ...config, yesButtonText: e.target.value })}
+                  placeholder="Yes! 💕"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="no-btn">No Button</Label>
+                <Input
+                  id="no-btn"
+                  value={config.noButtonText}
+                  onChange={(e) => setConfig({ ...config, noButtonText: e.target.value })}
+                  placeholder="No"
+                />
+              </div>
+            </div>
+            {/* Success State Text */}
+            <div className="pt-3 border-t border-border">
+              <p className="text-sm text-muted-foreground mb-3">After clicking "Yes":</p>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="headline">Headline</Label>
+                  <Label htmlFor="success-headline">Success Headline</Label>
                   <Input
-                    id="headline"
-                    value={config.headline}
-                    onChange={(e) => setConfig({ ...config, headline: e.target.value })}
-                    placeholder="Will You Be My Valentine?"
+                    id="success-headline"
+                    value={config.successHeadline}
+                    onChange={(e) => setConfig({ ...config, successHeadline: e.target.value })}
+                    placeholder="Yay! 🎉"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="subtext">Subtext</Label>
+                  <Label htmlFor="success-subtext">Success Message</Label>
                   <Input
-                    id="subtext"
-                    value={config.subtext}
-                    onChange={(e) => setConfig({ ...config, subtext: e.target.value })}
-                    placeholder="I really like you..."
+                    id="success-subtext"
+                    value={config.successSubtext}
+                    onChange={(e) => setConfig({ ...config, successSubtext: e.target.value })}
+                    placeholder="I knew you'd say yes! 💕"
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="yes-btn">Yes Button</Label>
-                  <Input
-                    id="yes-btn"
-                    value={config.yesButtonText}
-                    onChange={(e) => setConfig({ ...config, yesButtonText: e.target.value })}
-                    placeholder="Yes! 💕"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="no-btn">No Button</Label>
-                  <Input
-                    id="no-btn"
-                    value={config.noButtonText}
-                    onChange={(e) => setConfig({ ...config, noButtonText: e.target.value })}
-                    placeholder="No"
-                  />
-                </div>
-              </div>
-              {/* Success State Text */}
-              <div className="pt-3 border-t border-border">
-                <p className="text-sm text-muted-foreground mb-3">After clicking "Yes":</p>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="success-headline">Success Headline</Label>
-                    <Input
-                      id="success-headline"
-                      value={config.successHeadline}
-                      onChange={(e) => setConfig({ ...config, successHeadline: e.target.value })}
-                      placeholder="Yay! 🎉"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="success-subtext">Success Message</Label>
-                    <Input
-                      id="success-subtext"
-                      value={config.successSubtext}
-                      onChange={(e) => setConfig({ ...config, successSubtext: e.target.value })}
-                      placeholder="I knew you'd say yes! 💕"
-                    />
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Date Planning Section */}
         <Card className="mb-8">
@@ -335,8 +365,6 @@ export default function CreateSite() {
                 <DatePlanningConfig
                   enabled={config.enableDatePlanning}
                   onEnabledChange={(enabled) => setConfig({ ...config, enableDatePlanning: enabled })}
-                  availableDates={config.availableDates}
-                  onAvailableDatesChange={(dates) => setConfig({ ...config, availableDates: dates })}
                   timeSlots={config.timeSlots}
                   onTimeSlotsChange={(slots) => setConfig({ ...config, timeSlots: slots })}
                   foodOptions={config.foodOptions}
@@ -347,6 +375,26 @@ export default function CreateSite() {
               </CardContent>
             </CollapsibleContent>
           </Collapsible>
+        </Card>
+
+        {/* Personal Photos Section */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <ImagePlus className="w-5 h-5" />
+              📷 Personal Photos (Optional)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PhotoUploadConfig
+              enabled={config.enableBackgroundPhotos}
+              onEnabledChange={(enabled) => setConfig({ ...config, enableBackgroundPhotos: enabled })}
+              photos={config.backgroundPhotos}
+              onPhotosChange={(photos) => setConfig({ ...config, backgroundPhotos: photos })}
+              displayMode={config.photoDisplayMode}
+              onDisplayModeChange={(mode) => setConfig({ ...config, photoDisplayMode: mode })}
+            />
+          </CardContent>
         </Card>
 
         {/* Bottom Section: Themes (left) + Preview (right) */}
@@ -416,11 +464,12 @@ export default function CreateSite() {
                   config={config}
                   datePlanningConfig={{
                     enableDatePlanning: config.enableDatePlanning,
-                    availableDates: config.availableDates,
                     timeSlots: config.timeSlots,
                     foodOptions: config.foodOptions,
                     activityOptions: config.activityOptions,
                   }}
+                  backgroundPhotos={config.enableBackgroundPhotos ? config.backgroundPhotos : undefined}
+                  photoDisplayMode={config.photoDisplayMode}
                 />
               </div>
             </CardContent>

@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import DatePlanningForm, { DatePreferences } from "@/components/DatePlanningForm";
 import { DatePlanningConfig } from "@/components/TemplatePreview";
+import { PhotoBackground, PhotoGallery } from "@/components/PhotoUploadConfig";
+import { PhotoDisplayMode } from "@/components/PhotoUploadConfig";
 
 interface TeddyBearPreviewProps {
   config: {
@@ -13,6 +15,8 @@ interface TeddyBearPreviewProps {
     theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
   };
   datePlanningConfig?: DatePlanningConfig;
+  backgroundPhotos?: string[];
+  photoDisplayMode?: PhotoDisplayMode;
   isLive?: boolean;
   onYesClick?: () => void;
   onDateFormSubmit?: (preferences: DatePreferences) => Promise<void>;
@@ -116,6 +120,8 @@ const themeStyles = {
 export default function TeddyBearPreview({ 
   config, 
   datePlanningConfig,
+  backgroundPhotos,
+  photoDisplayMode = "background",
   isLive = false, 
   onYesClick,
   onDateFormSubmit,
@@ -178,7 +184,6 @@ export default function TeddyBearPreview({
   }, [config.theme]);
 
   const showDatePlanningForm = datePlanningConfig?.enableDatePlanning && 
-    datePlanningConfig.availableDates.length > 0 &&
     datePlanningConfig.timeSlots.length > 0;
   
   const handleDateFormSubmit = onDateFormSubmit || (async () => {
@@ -187,8 +192,15 @@ export default function TeddyBearPreview({
   });
 
   if (showSuccess) {
+    const showPhotosAfterYes = photoDisplayMode === "after_yes" && backgroundPhotos && backgroundPhotos.length > 0;
+    const showPhotosInBackground = photoDisplayMode === "background" && backgroundPhotos && backgroundPhotos.length > 0;
+    
     return (
       <div className={`h-full flex flex-col items-center justify-center p-4 ${holoClass} relative overflow-y-auto`}>
+        {/* Background Photos - only in background mode */}
+        {showPhotosInBackground && (
+          <PhotoBackground photos={backgroundPhotos} />
+        )}
         {/* Marquee text */}
         <div className="absolute top-4 left-0 right-0 overflow-hidden">
           <div className="animate-marquee whitespace-nowrap">
@@ -214,9 +226,13 @@ export default function TeddyBearPreview({
             {config.successSubtext || "I knew you couldn't resist! See you soon! 💕"}
           </p>
 
+          {/* Photo Gallery - only in after_yes mode */}
+          {showPhotosAfterYes && (
+            <PhotoGallery photos={backgroundPhotos} className="mb-6" />
+          )}
+
           {showDatePlanningForm && (
             <DatePlanningForm
-              availableDates={datePlanningConfig.availableDates}
               timeSlots={datePlanningConfig.timeSlots}
               foodOptions={datePlanningConfig.foodOptions}
               activityOptions={datePlanningConfig.activityOptions}
@@ -244,8 +260,14 @@ export default function TeddyBearPreview({
     );
   }
 
+  const showPhotosInBackground = photoDisplayMode === "background" && backgroundPhotos && backgroundPhotos.length > 0;
+
   return (
     <div className={`h-full flex flex-col items-center justify-center p-4 ${holoClass} relative overflow-hidden`}>
+      {/* Background Photos - only in background mode */}
+      {showPhotosInBackground && (
+        <PhotoBackground photos={backgroundPhotos} />
+      )}
       {/* Floating sad GIFs */}
       {floatingSadGifs.map((item) => (
         <div
@@ -276,12 +298,12 @@ export default function TeddyBearPreview({
         </p>
 
         {/* Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="flex flex-col items-center justify-center gap-6">
           <div
             className="flex items-center justify-center transition-all"
             style={{
-              width: `${140 * yesScale}px`,
-              height: `${52 * yesScale}px`,
+              minWidth: `${140 * yesScale}px`,
+              minHeight: `${52 * yesScale}px`,
             }}
           >
             <button

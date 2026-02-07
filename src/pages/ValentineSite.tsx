@@ -1,10 +1,12 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Heart, Loader2 } from "lucide-react";
 import TemplatePreview from "@/components/TemplatePreview";
 import { TemplateId } from "@/components/TemplateSelector";
 import { DatePreferences } from "@/components/DatePlanningForm";
+import { PasswordEntryScreen } from "@/components/PasswordProtection";
+import { PhotoDisplayMode } from "@/components/PhotoUploadConfig";
 
 interface SiteData {
   id: string;
@@ -17,58 +19,80 @@ interface SiteData {
   success_subtext: string | null;
   theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
   password_protected: boolean;
+  password_hash: string | null;
   enable_date_planning: boolean;
   available_dates: string[] | null;
   time_slots: string[] | null;
   food_options: string[] | null;
   activity_options: string[] | null;
+  background_photos: string[] | null;
+  photo_display_mode: string | null;
 }
-
-// Session storage keys for rate limiting
-const VIEWED_SITES_KEY = "lovelink_viewed_sites";
-const YES_CLICKED_SITES_KEY = "lovelink_yes_clicked_sites";
-
-// Helper to check if action was already performed this session
-const hasPerformedAction = (storageKey: string, siteId: string): boolean => {
-  try {
-    const stored = sessionStorage.getItem(storageKey);
-    if (!stored) return false;
-    const sites: string[] = JSON.parse(stored);
-    return sites.includes(siteId);
-  } catch {
-    return false;
-  }
-};
-
-// Helper to mark action as performed
-const markActionPerformed = (storageKey: string, siteId: string): void => {
-  try {
-    const stored = sessionStorage.getItem(storageKey);
-    const sites: string[] = stored ? JSON.parse(stored) : [];
-    if (!sites.includes(siteId)) {
-      sites.push(siteId);
-      sessionStorage.setItem(storageKey, JSON.stringify(sites));
-    }
-  } catch {
-    // Silently fail if sessionStorage is unavailable
-  }
-};
 
 export default function ValentineSite() {
   const { slug } = useParams<{ slug: string }>();
   const [site, setSite] = useState<SiteData | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [viewTracked, setViewTracked] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+  const [checkingPassword, setCheckingPassword] = useState(false);
 
-  const trackView = useCallback(async (siteId: string) => {
-    // Check if already viewed this session (rate limiting)
-    if (hasPerformedAction(VIEWED_SITES_KEY, siteId)) {
-      return;
+  useEffect(() => {
+    if (slug) {
+      fetchSite();
     }
+  }, [slug]);
 
-    // Mark as viewed before making requests
-    markActionPerformed(VIEWED_SITES_KEY, siteId);
+  const fetchSite = async () => {
+    const { data, error } = await supabase
+      .from("valentine_sites")
+      .select("*")
+      .eq("slug", slug)
+      .eq("is_published", true)
+      .maybeSingle();
 
+    if (error || !data) {
+      setNotFound(true);
+    } else {
+      setSite(data as SiteData);
+      // If not password protected, auto-unlock
+      if (!data.password_protected) {
+        setIsUnlocked(true);
+        // Track view immediately for non-protected sites
+        if (!viewTracked) {
+          trackView(data.id);
+          setViewTracked(true);
+        }
+      }
+    }
+    setLoading(false);
+  };
+
+  const handlePasswordSubmit = (enteredPassword: string) => {
+    if (!site) return;
+    
+    setCheckingPassword(true);
+    setPasswordError("");
+    
+    // Simple password check (comparing plain text for now)
+    // In production, you'd want to hash and compare server-side
+    if (enteredPassword === site.password_hash) {
+      setIsUnlocked(true);
+      // Track view after successful unlock
+      if (!viewTracked) {
+        trackView(site.id);
+        setViewTracked(true);
+      }
+    } else {
+      setPasswordError("Incorrect password. Please try again.");
+    }
+    
+    setCheckingPassword(false);
+  };
+
+  const trackView = async (siteId: string) => {
     // Insert view response
     await supabase.from("site_responses").insert({
       site_id: siteId,
@@ -81,61 +105,10 @@ export default function ValentineSite() {
     } catch {
       // RPC might not exist yet, silently fail
     }
-  }, []);
-
-  useEffect(() => {
-    if (slug) {
-      fetchSite();
-    }
-  }, [slug]);
-
-  const fetchSite = async () => {
-    // Query only the fields we need, explicitly excluding user_id for privacy
-    const { data, error } = await supabase
-      .from("valentine_sites")
-      .select(`
-        id,
-        slug,
-        headline,
-        subtext,
-        yes_button_text,
-        no_button_text,
-        template,
-        theme,
-        is_published,
-        enable_date_planning,
-        available_dates,
-        time_slots,
-        food_options,
-        activity_options,
-        success_headline,
-        success_subtext,
-        password_protected
-      `)
-      .eq("slug", slug)
-      .eq("is_published", true)
-      .maybeSingle();
-
-    if (error || !data) {
-      setNotFound(true);
-    } else {
-      setSite(data as SiteData);
-      // Track view with session-based deduplication
-      trackView(data.id);
-    }
-    setLoading(false);
   };
 
   const handleYesClick = async () => {
     if (!site) return;
-
-    // Check if already clicked yes this session (rate limiting)
-    if (hasPerformedAction(YES_CLICKED_SITES_KEY, site.id)) {
-      return;
-    }
-
-    // Mark as clicked before making requests
-    markActionPerformed(YES_CLICKED_SITES_KEY, site.id);
 
     await supabase.from("site_responses").insert({
       site_id: site.id,
@@ -184,10 +157,17 @@ export default function ValentineSite() {
 
   if (!site) return null;
 
-  // Parse available dates from string array to Date objects
-  const availableDates = site.available_dates 
-    ? site.available_dates.map(d => new Date(d))
-    : [];
+  // Show password screen if protected and not unlocked
+  if (site.password_protected && !isUnlocked) {
+    return (
+      <PasswordEntryScreen
+        onSubmit={handlePasswordSubmit}
+        error={passwordError}
+        isLoading={checkingPassword}
+        theme={site.theme}
+      />
+    );
+  }
 
   return (
     <div className="h-screen w-screen overflow-hidden">
@@ -204,11 +184,12 @@ export default function ValentineSite() {
         }}
         datePlanningConfig={{
           enableDatePlanning: site.enable_date_planning,
-          availableDates: availableDates,
           timeSlots: site.time_slots || [],
           foodOptions: site.food_options || [],
           activityOptions: site.activity_options || [],
         }}
+        backgroundPhotos={site.background_photos || undefined}
+        photoDisplayMode={(site.photo_display_mode as PhotoDisplayMode) || "background"}
         isLive
         onYesClick={handleYesClick}
         onDateFormSubmit={handleDateFormSubmit}
