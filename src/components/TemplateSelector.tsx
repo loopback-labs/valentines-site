@@ -2,7 +2,7 @@ import { Check } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-export type TemplateId = "classic" | "meme_gif";
+export type TemplateId = "classic" | "meme_gif" | "teddy_bear";
 
 interface Template {
   id: TemplateId;
@@ -26,6 +26,13 @@ const templates: Template[] = [
     emoji: "🐱",
     description: "Growing 'Yes' button with animated GIFs",
     features: ["Animated banners", "Growing button", "Meme style"],
+  },
+  {
+    id: "teddy_bear",
+    name: "Teddy Bear",
+    emoji: "🧸",
+    description: "Cute bear with holographic background",
+    features: ["Holographic BG", "Floating GIFs", "Growing Yes"],
   },
 ];
 
