@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Heart } from "lucide-react";
 import DatePlanningForm, { DatePreferences } from "@/components/DatePlanningForm";
 import { DatePlanningConfig } from "@/components/TemplatePreview";
+import { PhotoBackground, PhotoGallery } from "@/components/PhotoUploadConfig";
+import { PhotoDisplayMode } from "@/components/PhotoUploadConfig";
 
 interface MemeGifPreviewProps {
   config: {
@@ -14,6 +16,8 @@ interface MemeGifPreviewProps {
     theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
   };
   datePlanningConfig?: DatePlanningConfig;
+  backgroundPhotos?: string[];
+  photoDisplayMode?: PhotoDisplayMode;
   isLive?: boolean;
   onYesClick?: () => void;
   onDateFormSubmit?: (preferences: DatePreferences) => Promise<void>;
@@ -105,6 +109,8 @@ const themeStyles = {
 export default function MemeGifPreview({ 
   config, 
   datePlanningConfig,
+  backgroundPhotos,
+  photoDisplayMode = "background",
   isLive = false, 
   onYesClick,
   onDateFormSubmit,
@@ -137,7 +143,6 @@ export default function MemeGifPreview({
   }, [config.theme]);
 
   const showDatePlanningForm = datePlanningConfig?.enableDatePlanning && 
-    datePlanningConfig.availableDates.length > 0 &&
     datePlanningConfig.timeSlots.length > 0;
   
   const handleDateFormSubmit = onDateFormSubmit || (async () => {
@@ -146,9 +151,16 @@ export default function MemeGifPreview({
   });
 
   if (showSuccess) {
+    const showPhotosAfterYes = photoDisplayMode === "after_yes" && backgroundPhotos && backgroundPhotos.length > 0;
+    const showPhotosInBackground = photoDisplayMode === "background" && backgroundPhotos && backgroundPhotos.length > 0;
+    
     return (
-      <div className={`h-full flex flex-col items-center justify-center p-4 ${styles.bg} overflow-y-auto`}>
-        <div className={`max-w-md w-full ${styles.card} rounded-2xl p-6 text-center`}>
+      <div className={`h-full flex flex-col items-center justify-center p-4 ${styles.bg} overflow-y-auto relative`}>
+        {/* Background Photos - only in background mode */}
+        {showPhotosInBackground && (
+          <PhotoBackground photos={backgroundPhotos} />
+        )}
+        <div className={`max-w-md w-full ${styles.card} rounded-2xl p-6 text-center relative z-10`}>
           <div className="w-48 h-48 mx-auto mb-4 rounded-xl overflow-hidden">
             <img
               src={happyGifsByTheme[config.theme] || happyGifsByTheme.cute}
@@ -163,9 +175,13 @@ export default function MemeGifPreview({
             {config.successSubtext || "I knew you'd say yes! See you soon! 💕"}
           </p>
 
+          {/* Photo Gallery - only in after_yes mode */}
+          {showPhotosAfterYes && (
+            <PhotoGallery photos={backgroundPhotos} className="mb-6" />
+          )}
+
           {showDatePlanningForm && (
             <DatePlanningForm
-              availableDates={datePlanningConfig.availableDates}
               timeSlots={datePlanningConfig.timeSlots}
               foodOptions={datePlanningConfig.foodOptions}
               activityOptions={datePlanningConfig.activityOptions}
@@ -187,8 +203,14 @@ export default function MemeGifPreview({
     chaotic: "text-yellow-400",
   };
 
+  const showPhotosInBackground = photoDisplayMode === "background" && backgroundPhotos && backgroundPhotos.length > 0;
+
   return (
     <div className={`h-full flex flex-col items-center justify-center p-4 ${styles.bg} relative overflow-hidden`}>
+      {/* Background Photos - only in background mode */}
+      {showPhotosInBackground && (
+        <PhotoBackground photos={backgroundPhotos} />
+      )}
       {/* Floating Hearts Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(12)].map((_, i) => (
@@ -229,12 +251,12 @@ export default function MemeGifPreview({
         </div>
 
         {/* Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="flex flex-row items-center justify-center gap-4">
           <div 
-            className="flex items-center justify-center transition-all"
+            className="flex items-center justify-center transition-all shrink-0"
             style={{ 
-              width: `${120 * yesScale}px`,
-              height: `${48 * yesScale}px`,
+              minWidth: `${120 * yesScale}px`,
+              minHeight: `${48 * yesScale}px`,
             }}
           >
             <button
@@ -250,7 +272,7 @@ export default function MemeGifPreview({
 
           <button
             onClick={handleNoClick}
-            className={`px-6 py-3 rounded-full font-semibold transition-all ${styles.buttonNo}`}
+            className={`px-6 py-3 rounded-full font-semibold transition-all shrink-0 ${styles.buttonNo}`}
             style={{
               transform: `scale(${Math.max(0.7, 1 - noIndex * 0.05)})`,
               opacity: Math.max(0.5, 1 - noIndex * 0.03),

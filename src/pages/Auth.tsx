@@ -107,7 +107,7 @@ export default function Auth() {
           <Sparkles className="w-6 h-6 text-accent absolute -top-1 -right-1" />
         </div>
         <h1 className="text-3xl md:text-4xl font-bold text-primary-foreground">
-          LoveLink
+          Valentine Maker
         </h1>
       </div>
 

@@ -3,10 +3,10 @@ import ClassicPreview from "./templates/ClassicPreview";
 import MemeGifPreview from "./templates/MemeGifPreview";
 import TeddyBearPreview from "./templates/TeddyBearPreview";
 import { DatePreferences } from "./DatePlanningForm";
+import { PhotoDisplayMode } from "./PhotoUploadConfig";
 
 export interface DatePlanningConfig {
   enableDatePlanning: boolean;
-  availableDates: Date[];
   timeSlots: string[];
   foodOptions: string[];
   activityOptions: string[];
@@ -24,6 +24,8 @@ interface TemplatePreviewProps {
     theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
   };
   datePlanningConfig?: DatePlanningConfig;
+  backgroundPhotos?: string[];
+  photoDisplayMode?: PhotoDisplayMode;
   isLive?: boolean;
   onYesClick?: () => void;
   onDateFormSubmit?: (preferences: DatePreferences) => Promise<void>;
@@ -33,6 +35,8 @@ export default function TemplatePreview({
   template, 
   config, 
   datePlanningConfig,
+  backgroundPhotos,
+  photoDisplayMode = "background",
   isLive = false, 
   onYesClick,
   onDateFormSubmit,
@@ -43,6 +47,8 @@ export default function TemplatePreview({
         <MemeGifPreview 
           config={config} 
           datePlanningConfig={datePlanningConfig}
+          backgroundPhotos={backgroundPhotos}
+          photoDisplayMode={photoDisplayMode}
           isLive={isLive} 
           onYesClick={onYesClick}
           onDateFormSubmit={onDateFormSubmit}
@@ -53,6 +59,8 @@ export default function TemplatePreview({
         <TeddyBearPreview 
           config={config} 
           datePlanningConfig={datePlanningConfig}
+          backgroundPhotos={backgroundPhotos}
+          photoDisplayMode={photoDisplayMode}
           isLive={isLive} 
           onYesClick={onYesClick}
           onDateFormSubmit={onDateFormSubmit}
@@ -64,6 +72,8 @@ export default function TemplatePreview({
         <ClassicPreview 
           config={config} 
           datePlanningConfig={datePlanningConfig}
+          backgroundPhotos={backgroundPhotos}
+          photoDisplayMode={photoDisplayMode}
           isLive={isLive} 
           onYesClick={onYesClick}
           onDateFormSubmit={onDateFormSubmit}

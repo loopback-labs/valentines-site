@@ -50,13 +50,6 @@ export type Database = {
             referencedRelation: "valentine_sites"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "date_preferences_site_id_fkey"
-            columns: ["site_id"]
-            isOneToOne: false
-            referencedRelation: "valentine_sites_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       profiles: {
@@ -114,13 +107,6 @@ export type Database = {
             columns: ["site_id"]
             isOneToOne: false
             referencedRelation: "valentine_sites"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "site_responses_site_id_fkey"
-            columns: ["site_id"]
-            isOneToOne: false
-            referencedRelation: "valentine_sites_public"
             referencedColumns: ["id"]
           },
         ]
@@ -214,87 +200,7 @@ export type Database = {
       }
     }
     Views: {
-      valentine_sites_public: {
-        Row: {
-          activity_options: string[] | null
-          available_dates: string[] | null
-          background_photos: string[] | null
-          created_at: string | null
-          enable_date_planning: boolean | null
-          food_options: string[] | null
-          headline: string | null
-          id: string | null
-          is_published: boolean | null
-          no_button_text: string | null
-          no_button_variants: string[] | null
-          password_protected: boolean | null
-          photo_display_mode: string | null
-          slug: string | null
-          subtext: string | null
-          success_headline: string | null
-          success_subtext: string | null
-          template: string | null
-          theme: Database["public"]["Enums"]["site_theme"] | null
-          time_slots: string[] | null
-          updated_at: string | null
-          view_count: number | null
-          yes_button_text: string | null
-          yes_count: number | null
-        }
-        Insert: {
-          activity_options?: string[] | null
-          available_dates?: string[] | null
-          background_photos?: string[] | null
-          created_at?: string | null
-          enable_date_planning?: boolean | null
-          food_options?: string[] | null
-          headline?: string | null
-          id?: string | null
-          is_published?: boolean | null
-          no_button_text?: string | null
-          no_button_variants?: string[] | null
-          password_protected?: boolean | null
-          photo_display_mode?: string | null
-          slug?: string | null
-          subtext?: string | null
-          success_headline?: string | null
-          success_subtext?: string | null
-          template?: string | null
-          theme?: Database["public"]["Enums"]["site_theme"] | null
-          time_slots?: string[] | null
-          updated_at?: string | null
-          view_count?: number | null
-          yes_button_text?: string | null
-          yes_count?: number | null
-        }
-        Update: {
-          activity_options?: string[] | null
-          available_dates?: string[] | null
-          background_photos?: string[] | null
-          created_at?: string | null
-          enable_date_planning?: boolean | null
-          food_options?: string[] | null
-          headline?: string | null
-          id?: string | null
-          is_published?: boolean | null
-          no_button_text?: string | null
-          no_button_variants?: string[] | null
-          password_protected?: boolean | null
-          photo_display_mode?: string | null
-          slug?: string | null
-          subtext?: string | null
-          success_headline?: string | null
-          success_subtext?: string | null
-          template?: string | null
-          theme?: Database["public"]["Enums"]["site_theme"] | null
-          time_slots?: string[] | null
-          updated_at?: string | null
-          view_count?: number | null
-          yes_button_text?: string | null
-          yes_count?: number | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       increment_view_count: { Args: { site_id: string }; Returns: undefined }

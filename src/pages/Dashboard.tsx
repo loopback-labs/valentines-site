@@ -99,7 +99,7 @@ export default function Dashboard() {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/dashboard" className="flex items-center gap-2 hover-grow">
             <Heart className="w-8 h-8 text-primary" fill="currentColor" />
-            <span className="text-xl font-bold text-gradient-love bg-clip-text">LoveLink</span>
+            <span className="text-xl font-bold text-gradient-love bg-clip-text">Valentine Maker</span>
           </Link>
 
           <div className="flex items-center gap-4">
@@ -258,6 +258,9 @@ export default function Dashboard() {
                   <div className="flex gap-2">
                     <Button asChild variant="outline" size="sm" className="flex-1">
                       <Link to={`/edit/${site.id}`}>Edit</Link>
+                    </Button>
+                    <Button asChild variant="outline" size="sm">
+                      <Link to={`/responses/${site.id}`}>Responses</Link>
                     </Button>
                     {site.is_published && (
                       <Button asChild variant="outline" size="sm">
