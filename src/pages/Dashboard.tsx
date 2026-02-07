@@ -11,6 +11,7 @@ interface ValentineSite {
   id: string;
   slug: string;
   headline: string;
+  template: string;
   theme: string;
   is_published: boolean;
   view_count: number;
@@ -83,6 +84,11 @@ export default function Dashboard() {
     dark: "🌙",
     pastel: "🍬",
     chaotic: "🎪",
+  };
+
+  const templateLabels: Record<string, { name: string; emoji: string }> = {
+    classic: { name: "Classic", emoji: "💕" },
+    meme_gif: { name: "Meme GIF", emoji: "🐱" },
   };
 
   return (
@@ -223,10 +229,13 @@ export default function Dashboard() {
                         {site.headline.slice(0, 30)}
                         {site.headline.length > 30 && "..."}
                       </CardTitle>
-                      <CardDescription className="flex items-center gap-1 mt-1">
+                      <CardDescription className="flex items-center gap-1 mt-1 flex-wrap">
                         /{site.slug}
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground ml-2">
+                          {templateLabels[site.template]?.emoji || "💕"} {templateLabels[site.template]?.name || "Classic"}
+                        </span>
                         {site.is_published && (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-accent text-accent-foreground ml-2">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-accent text-accent-foreground ml-1">
                             Live
                           </span>
                         )}

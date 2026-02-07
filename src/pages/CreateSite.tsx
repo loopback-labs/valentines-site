@@ -5,16 +5,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heart, ArrowLeft, Sparkles, Monitor, Smartphone, Check, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
-import ValentinePreview from "@/components/ValentinePreview";
+import TemplateSelector, { TemplateId } from "@/components/TemplateSelector";
+import TemplatePreview from "@/components/TemplatePreview";
 
 type Theme = "cute" | "minimal" | "dark" | "pastel" | "chaotic";
 
 interface SiteConfig {
+  template: TemplateId;
   headline: string;
   subtext: string;
   yesButtonText: string;
@@ -39,6 +40,7 @@ export default function CreateSite() {
   const [slugError, setSlugError] = useState("");
 
   const [config, setConfig] = useState<SiteConfig>({
+    template: "classic",
     headline: "Will You Be My Valentine?",
     subtext: "I really like you... 💕",
     yesButtonText: "Yes! 💕",
@@ -107,6 +109,7 @@ export default function CreateSite() {
     const { data, error } = await supabase.from("valentine_sites").insert({
       user_id: user.id,
       slug: config.slug,
+      template: config.template,
       headline: config.headline,
       subtext: config.subtext,
       yes_button_text: config.yesButtonText,
@@ -170,6 +173,19 @@ export default function CreateSite() {
       </header>
 
       <div className="container mx-auto px-4 py-8">
+        {/* Step 1: Template Selection */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-lg">🎨 Choose Template</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <TemplateSelector
+              selected={config.template}
+              onSelect={(template) => setConfig({ ...config, template })}
+            />
+          </CardContent>
+        </Card>
+
         {/* Top Section: URL and Text */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* URL Slug */}
@@ -308,7 +324,7 @@ export default function CreateSite() {
                   previewMode === "mobile" ? "max-w-[375px]" : "w-full"
                 }`}
               >
-                <ValentinePreview config={config} />
+                <TemplatePreview template={config.template} config={config} />
               </div>
             </CardContent>
           </Card>
