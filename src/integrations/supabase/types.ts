@@ -85,6 +85,7 @@ export type Database = {
           password_protected: boolean
           slug: string
           subtext: string | null
+          template: string
           theme: Database["public"]["Enums"]["site_theme"]
           updated_at: string
           user_id: string
@@ -103,6 +104,7 @@ export type Database = {
           password_protected?: boolean
           slug: string
           subtext?: string | null
+          template?: string
           theme?: Database["public"]["Enums"]["site_theme"]
           updated_at?: string
           user_id: string
@@ -121,6 +123,7 @@ export type Database = {
           password_protected?: boolean
           slug?: string
           subtext?: string | null
+          template?: string
           theme?: Database["public"]["Enums"]["site_theme"]
           updated_at?: string
           user_id?: string

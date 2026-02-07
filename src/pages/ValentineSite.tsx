@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Heart, Loader2 } from "lucide-react";
-import ValentinePreview from "@/components/ValentinePreview";
+import TemplatePreview from "@/components/TemplatePreview";
+import { TemplateId } from "@/components/TemplateSelector";
 
 interface SiteData {
   id: string;
+  template: TemplateId;
   headline: string;
   subtext: string;
   yes_button_text: string;
@@ -103,7 +105,8 @@ export default function ValentineSite() {
 
   return (
     <div className="h-screen w-screen overflow-hidden">
-      <ValentinePreview
+      <TemplatePreview
+        template={site.template || "classic"}
         config={{
           headline: site.headline,
           subtext: site.subtext || "",
