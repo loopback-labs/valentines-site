@@ -6,11 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, ArrowLeft, Sparkles, Monitor, Smartphone, Check, Loader2 } from "lucide-react";
+import { Heart, ArrowLeft, Sparkles, Monitor, Smartphone, Check, Loader2, CalendarDays } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import TemplateSelector, { TemplateId } from "@/components/TemplateSelector";
 import TemplatePreview from "@/components/TemplatePreview";
+import DatePlanningConfig, { 
+  DEFAULT_TIME_SLOTS, 
+  DEFAULT_FOOD_OPTIONS, 
+  DEFAULT_ACTIVITY_OPTIONS 
+} from "@/components/DatePlanningConfig";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 type Theme = "cute" | "minimal" | "dark" | "pastel" | "chaotic";
 
@@ -24,6 +30,11 @@ interface SiteConfig {
   successSubtext: string;
   theme: Theme;
   slug: string;
+  enableDatePlanning: boolean;
+  availableDates: Date[];
+  timeSlots: string[];
+  foodOptions: string[];
+  activityOptions: string[];
 }
 
 const themes: { id: Theme; name: string; emoji: string; description: string }[] = [
@@ -40,6 +51,7 @@ export default function CreateSite() {
   const [isSaving, setIsSaving] = useState(false);
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
   const [slugError, setSlugError] = useState("");
+  const [datePlanningOpen, setDatePlanningOpen] = useState(false);
 
   const [config, setConfig] = useState<SiteConfig>({
     template: "classic",
@@ -51,6 +63,11 @@ export default function CreateSite() {
     successSubtext: "I promise to make you smile every single day!",
     theme: "cute",
     slug: "",
+    enableDatePlanning: false,
+    availableDates: [],
+    timeSlots: [...DEFAULT_TIME_SLOTS],
+    foodOptions: [...DEFAULT_FOOD_OPTIONS],
+    activityOptions: [...DEFAULT_ACTIVITY_OPTIONS],
   });
 
   if (loading) {
@@ -120,6 +137,15 @@ export default function CreateSite() {
       no_button_text: config.noButtonText,
       theme: config.theme,
       is_published: publish,
+      enable_date_planning: config.enableDatePlanning,
+      available_dates: config.availableDates.length > 0 
+        ? config.availableDates.map(d => d.toISOString().split('T')[0]) 
+        : null,
+      time_slots: config.timeSlots,
+      food_options: config.foodOptions,
+      activity_options: config.activityOptions,
+      success_headline: config.successHeadline,
+      success_subtext: config.successSubtext,
     }).select().single();
 
     if (error) {
@@ -290,6 +316,39 @@ export default function CreateSite() {
           </Card>
         </div>
 
+        {/* Date Planning Section */}
+        <Card className="mb-8">
+          <Collapsible open={datePlanningOpen} onOpenChange={setDatePlanningOpen}>
+            <CollapsibleTrigger asChild>
+              <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <CalendarDays className="w-5 h-5" />
+                  📅 Date Planning (Optional)
+                  <span className="text-sm font-normal text-muted-foreground ml-auto">
+                    {datePlanningOpen ? "Click to collapse" : "Click to expand"}
+                  </span>
+                </CardTitle>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent>
+                <DatePlanningConfig
+                  enabled={config.enableDatePlanning}
+                  onEnabledChange={(enabled) => setConfig({ ...config, enableDatePlanning: enabled })}
+                  availableDates={config.availableDates}
+                  onAvailableDatesChange={(dates) => setConfig({ ...config, availableDates: dates })}
+                  timeSlots={config.timeSlots}
+                  onTimeSlotsChange={(slots) => setConfig({ ...config, timeSlots: slots })}
+                  foodOptions={config.foodOptions}
+                  onFoodOptionsChange={(options) => setConfig({ ...config, foodOptions: options })}
+                  activityOptions={config.activityOptions}
+                  onActivityOptionsChange={(options) => setConfig({ ...config, activityOptions: options })}
+                />
+              </CardContent>
+            </CollapsibleContent>
+          </Collapsible>
+        </Card>
+
         {/* Bottom Section: Themes (left) + Preview (right) */}
         <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8">
           {/* Theme Selection */}
@@ -352,7 +411,17 @@ export default function CreateSite() {
                   previewMode === "mobile" ? "max-w-[375px]" : "w-full"
                 }`}
               >
-                <TemplatePreview template={config.template} config={config} />
+                <TemplatePreview 
+                  template={config.template} 
+                  config={config}
+                  datePlanningConfig={{
+                    enableDatePlanning: config.enableDatePlanning,
+                    availableDates: config.availableDates,
+                    timeSlots: config.timeSlots,
+                    foodOptions: config.foodOptions,
+                    activityOptions: config.activityOptions,
+                  }}
+                />
               </div>
             </CardContent>
           </Card>
