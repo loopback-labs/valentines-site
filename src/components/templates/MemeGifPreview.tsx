@@ -35,7 +35,15 @@ const noButtonVariants = [
 const gifStates = {
   neutral: "https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif", // Cute pleading cat
   sad: "https://media.giphy.com/media/BEob5qwFkSJ7G/giphy.gif", // Sad cat
-  happy: "https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif", // Happy celebration cat
+};
+
+// Theme-specific happy/celebration GIFs
+const happyGifsByTheme: Record<string, string> = {
+  cute: "https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif", // Happy celebration cat
+  minimal: "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif", // Simple thumbs up
+  dark: "https://media.giphy.com/media/l4pTdcifPZLpDjL1e/giphy.gif", // Mysterious celebration
+  pastel: "https://media.giphy.com/media/11sBLVxNs7v6WA/giphy.gif", // Soft happy dance
+  chaotic: "https://media.giphy.com/media/5xaOcLGvzHxDKjufnLW/giphy.gif", // Wild celebration
 };
 
 const themeStyles = {
@@ -115,7 +123,7 @@ export default function MemeGifPreview({ config, isLive = false, onYesClick }: M
         <div className={`max-w-md w-full ${styles.card} rounded-2xl p-6 text-center`}>
           <div className="w-48 h-48 mx-auto mb-4 rounded-xl overflow-hidden">
             <img
-              src={gifStates.happy}
+              src={happyGifsByTheme[config.theme] || happyGifsByTheme.cute}
               alt="Celebration"
               className="w-full h-full object-cover"
             />
