@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Heart } from "lucide-react";
 
 interface MemeGifPreviewProps {
   config: {
@@ -145,9 +146,37 @@ export default function MemeGifPreview({ config, isLive = false, onYesClick }: M
     );
   }
 
+  // Heart color based on theme
+  const heartColors: Record<string, string> = {
+    cute: "text-pink-400",
+    minimal: "text-gray-400",
+    dark: "text-purple-500",
+    pastel: "text-purple-400",
+    chaotic: "text-yellow-400",
+  };
+
   return (
-    <div className={`h-full flex flex-col items-center justify-center p-4 ${styles.bg}`}>
-      <div className={`max-w-md w-full ${styles.card} rounded-2xl p-6`}>
+    <div className={`h-full flex flex-col items-center justify-center p-4 ${styles.bg} relative overflow-hidden`}>
+      {/* Floating Hearts Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(12)].map((_, i) => (
+          <Heart
+            key={i}
+            className={`absolute ${heartColors[config.theme]} opacity-20 animate-float`}
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              width: `${12 + Math.random() * 20}px`,
+              height: `${12 + Math.random() * 20}px`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${3 + Math.random() * 2}s`,
+            }}
+            fill="currentColor"
+          />
+        ))}
+      </div>
+
+      <div className={`max-w-md w-full ${styles.card} rounded-2xl p-6 relative z-10`}>
         {/* GIF Banner */}
         <div className="w-full aspect-square max-w-[200px] mx-auto mb-6 rounded-xl overflow-hidden">
           <img
