@@ -116,6 +116,19 @@ export default function DatePlanningConfig({
 
       {enabled && (
         <div className="space-y-6 pt-4 border-t border-border">
+          {/* Date Selection Info */}
+          <div className="rounded-lg bg-muted/50 p-4 border border-border">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 text-primary">📅</div>
+              <div>
+                <p className="text-sm font-medium">Date Selection</p>
+                <p className="text-xs text-muted-foreground">
+                  Visitors will see a date picker to choose any future date for the date
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Time Slots */}
           <div className="space-y-3">
             <Label className="text-sm font-medium">Time Slots</Label>
