@@ -8,6 +8,7 @@ import { DatePreferences } from "@/components/DatePlanningForm";
 import { PasswordEntryScreen } from "@/components/PasswordProtection";
 import { PhotoDisplayMode } from "@/components/PhotoUploadConfig";
 
+// SiteData now excludes password_hash - it's never sent to the client
 interface SiteData {
   id: string;
   template: TemplateId;
@@ -19,7 +20,6 @@ interface SiteData {
   success_subtext: string | null;
   theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
   password_protected: boolean;
-  password_hash: string | null;
   enable_date_planning: boolean;
   available_dates: string[] | null;
   time_slots: string[] | null;
@@ -46,11 +46,11 @@ export default function ValentineSite() {
   }, [slug]);
 
   const fetchSite = async () => {
+    // Use the public view which excludes sensitive columns like password_hash
     const { data, error } = await supabase
-      .from("valentine_sites")
+      .from("valentine_sites_public")
       .select("*")
       .eq("slug", slug)
-      .eq("is_published", true)
       .maybeSingle();
 
     if (error || !data) {
@@ -70,23 +70,39 @@ export default function ValentineSite() {
     setLoading(false);
   };
 
-  const handlePasswordSubmit = (enteredPassword: string) => {
+  const handlePasswordSubmit = async (enteredPassword: string) => {
     if (!site) return;
     
     setCheckingPassword(true);
     setPasswordError("");
     
-    // Simple password check (comparing plain text for now)
-    // In production, you'd want to hash and compare server-side
-    if (enteredPassword === site.password_hash) {
-      setIsUnlocked(true);
-      // Track view after successful unlock
-      if (!viewTracked) {
-        trackView(site.id);
-        setViewTracked(true);
+    try {
+      // Verify password server-side via edge function
+      // Password is never sent to the client - verification happens securely on the server
+      const { data, error } = await supabase.functions.invoke('verify-site-password', {
+        body: { site_id: site.id, password: enteredPassword }
+      });
+
+      if (error) {
+        console.error('Password verification error:', error);
+        setPasswordError("Something went wrong. Please try again.");
+        setCheckingPassword(false);
+        return;
       }
-    } else {
-      setPasswordError("Incorrect password. Please try again.");
+
+      if (data?.valid) {
+        setIsUnlocked(true);
+        // Track view after successful unlock
+        if (!viewTracked) {
+          trackView(site.id);
+          setViewTracked(true);
+        }
+      } else {
+        setPasswordError("Incorrect password. Please try again.");
+      }
+    } catch (err) {
+      console.error('Password verification failed:', err);
+      setPasswordError("Something went wrong. Please try again.");
     }
     
     setCheckingPassword(false);
