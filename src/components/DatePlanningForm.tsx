@@ -15,7 +15,6 @@ export interface DatePreferences {
 }
 
 interface DatePlanningFormProps {
-  availableDates: Date[];
   timeSlots: string[];
   foodOptions: string[];
   activityOptions: string[];
@@ -79,7 +78,6 @@ const themeStyles = {
 type Step = "cta" | "date" | "time" | "food" | "activity" | "submitted";
 
 export default function DatePlanningForm({
-  availableDates,
   timeSlots,
   foodOptions,
   activityOptions,
@@ -94,12 +92,6 @@ export default function DatePlanningForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const styles = themeStyles[theme];
-
-  const isDateAvailable = (date: Date) => {
-    return availableDates.some(
-      (d) => d.toDateString() === date.toDateString()
-    );
-  };
 
   const handleNext = () => {
     if (step === "cta") setStep("date");
@@ -237,7 +229,7 @@ export default function DatePlanningForm({
                 mode="single"
                 selected={selectedDate}
                 onSelect={setSelectedDate}
-                disabled={(date) => !isDateAvailable(date)}
+                disabled={(date) => date < new Date()}
                 className={cn("p-3 pointer-events-auto")}
               />
             </PopoverContent>

@@ -31,7 +31,6 @@ interface SiteConfig {
   theme: Theme;
   slug: string;
   enableDatePlanning: boolean;
-  availableDates: Date[];
   timeSlots: string[];
   foodOptions: string[];
   activityOptions: string[];
@@ -64,7 +63,6 @@ export default function CreateSite() {
     theme: "cute",
     slug: "",
     enableDatePlanning: false,
-    availableDates: [],
     timeSlots: [...DEFAULT_TIME_SLOTS],
     foodOptions: [...DEFAULT_FOOD_OPTIONS],
     activityOptions: [...DEFAULT_ACTIVITY_OPTIONS],
@@ -138,9 +136,6 @@ export default function CreateSite() {
       theme: config.theme,
       is_published: publish,
       enable_date_planning: config.enableDatePlanning,
-      available_dates: config.availableDates.length > 0 
-        ? config.availableDates.map(d => d.toISOString().split('T')[0]) 
-        : null,
       time_slots: config.timeSlots,
       food_options: config.foodOptions,
       activity_options: config.activityOptions,
@@ -335,8 +330,6 @@ export default function CreateSite() {
                 <DatePlanningConfig
                   enabled={config.enableDatePlanning}
                   onEnabledChange={(enabled) => setConfig({ ...config, enableDatePlanning: enabled })}
-                  availableDates={config.availableDates}
-                  onAvailableDatesChange={(dates) => setConfig({ ...config, availableDates: dates })}
                   timeSlots={config.timeSlots}
                   onTimeSlotsChange={(slots) => setConfig({ ...config, timeSlots: slots })}
                   foodOptions={config.foodOptions}
@@ -416,7 +409,6 @@ export default function CreateSite() {
                   config={config}
                   datePlanningConfig={{
                     enableDatePlanning: config.enableDatePlanning,
-                    availableDates: config.availableDates,
                     timeSlots: config.timeSlots,
                     foodOptions: config.foodOptions,
                     activityOptions: config.activityOptions,
