@@ -123,10 +123,6 @@ export default function ValentineSite() {
 
   if (!site) return null;
 
-  // Parse available dates from string array to Date objects
-  const availableDates = site.available_dates 
-    ? site.available_dates.map(d => new Date(d))
-    : [];
 
   return (
     <div className="h-screen w-screen overflow-hidden">
@@ -143,7 +139,6 @@ export default function ValentineSite() {
         }}
         datePlanningConfig={{
           enableDatePlanning: site.enable_date_planning,
-          availableDates: availableDates,
           timeSlots: site.time_slots || [],
           foodOptions: site.food_options || [],
           activityOptions: site.activity_options || [],
