@@ -197,17 +197,24 @@ export default function MemeGifPreview({ config, isLive = false, onYesClick }: M
         </div>
 
         {/* Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <button
-            onClick={handleYesClick}
-            className={`px-6 py-3 rounded-full font-semibold transition-all ${styles.buttonYes}`}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div 
+            className="flex items-center justify-center transition-all"
             style={{ 
-              transform: `scale(${yesScale})`,
-              zIndex: 10,
+              width: `${120 * yesScale}px`,
+              height: `${48 * yesScale}px`,
             }}
           >
-            {config.yesButtonText || "Yes! 💕"}
-          </button>
+            <button
+              onClick={handleYesClick}
+              className={`px-6 py-3 rounded-full font-semibold transition-all whitespace-nowrap ${styles.buttonYes}`}
+              style={{ 
+                transform: `scale(${yesScale})`,
+              }}
+            >
+              {config.yesButtonText || "Yes! 💕"}
+            </button>
+          </div>
 
           <button
             onClick={handleNoClick}
