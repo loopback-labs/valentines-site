@@ -170,41 +170,41 @@ export default function CreateSite() {
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Configuration Panel */}
-          <div className="space-y-6">
-            {/* URL Slug */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Your URL</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground text-sm">/</span>
-                  <Input
-                    value={config.slug}
-                    onChange={(e) => handleSlugChange(e.target.value)}
-                    placeholder="your-name"
-                    className={slugError ? "border-destructive" : ""}
-                  />
-                </div>
-                {slugError && (
-                  <p className="text-sm text-destructive mt-2">{slugError}</p>
-                )}
-                <p className="text-xs text-muted-foreground mt-2">
-                  This will be your shareable link
-                </p>
-              </CardContent>
-            </Card>
+        {/* Top Section: URL and Text */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* URL Slug */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Your URL</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground text-sm">/</span>
+                <Input
+                  value={config.slug}
+                  onChange={(e) => handleSlugChange(e.target.value)}
+                  placeholder="your-name"
+                  className={slugError ? "border-destructive" : ""}
+                />
+              </div>
+              {slugError && (
+                <p className="text-sm text-destructive mt-2">{slugError}</p>
+              )}
+              <p className="text-xs text-muted-foreground mt-2">
+                This will be your shareable link
+              </p>
+            </CardContent>
+          </Card>
 
-            {/* Text Customization */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">✏️ Text</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+          {/* Text Customization */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">✏️ Text</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="headline">Main Headline</Label>
+                  <Label htmlFor="headline">Headline</Label>
                   <Input
                     id="headline"
                     value={config.headline}
@@ -212,108 +212,106 @@ export default function CreateSite() {
                     placeholder="Will You Be My Valentine?"
                   />
                 </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="subtext">Subtext</Label>
-                  <Textarea
+                  <Input
                     id="subtext"
                     value={config.subtext}
                     onChange={(e) => setConfig({ ...config, subtext: e.target.value })}
                     placeholder="I really like you..."
-                    rows={2}
                   />
                 </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="yes-btn">Yes Button</Label>
-                    <Input
-                      id="yes-btn"
-                      value={config.yesButtonText}
-                      onChange={(e) => setConfig({ ...config, yesButtonText: e.target.value })}
-                      placeholder="Yes! 💕"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="no-btn">No Button</Label>
-                    <Input
-                      id="no-btn"
-                      value={config.noButtonText}
-                      onChange={(e) => setConfig({ ...config, noButtonText: e.target.value })}
-                      placeholder="No"
-                    />
-                  </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="yes-btn">Yes Button</Label>
+                  <Input
+                    id="yes-btn"
+                    value={config.yesButtonText}
+                    onChange={(e) => setConfig({ ...config, yesButtonText: e.target.value })}
+                    placeholder="Yes! 💕"
+                  />
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Theme Selection */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">🎨 Theme</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {themes.map((theme) => (
-                    <button
-                      key={theme.id}
-                      onClick={() => setConfig({ ...config, theme: theme.id })}
-                      className={`p-4 rounded-xl border-2 text-left transition-all hover-grow ${
-                        config.theme === theme.id
-                          ? "border-primary bg-primary/5 glow-pink"
-                          : "border-border hover:border-primary/50"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-2xl">{theme.emoji}</span>
-                        {config.theme === theme.id && (
-                          <Check className="w-5 h-5 text-primary" />
-                        )}
-                      </div>
-                      <p className="font-medium">{theme.name}</p>
-                      <p className="text-xs text-muted-foreground">{theme.description}</p>
-                    </button>
-                  ))}
+                <div className="space-y-2">
+                  <Label htmlFor="no-btn">No Button</Label>
+                  <Input
+                    id="no-btn"
+                    value={config.noButtonText}
+                    onChange={(e) => setConfig({ ...config, noButtonText: e.target.value })}
+                    placeholder="No"
+                  />
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Bottom Section: Themes (left) + Preview (right) */}
+        <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8">
+          {/* Theme Selection */}
+          <Card className="h-fit">
+            <CardHeader>
+              <CardTitle className="text-lg">🎨 Theme</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col gap-3">
+                {themes.map((theme) => (
+                  <button
+                    key={theme.id}
+                    onClick={() => setConfig({ ...config, theme: theme.id })}
+                    className={`p-4 rounded-xl border-2 text-left transition-all hover-grow ${
+                      config.theme === theme.id
+                        ? "border-primary bg-primary/5 glow-pink"
+                        : "border-border hover:border-primary/50"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-2xl">{theme.emoji}</span>
+                      {config.theme === theme.id && (
+                        <Check className="w-5 h-5 text-primary" />
+                      )}
+                    </div>
+                    <p className="font-medium">{theme.name}</p>
+                    <p className="text-xs text-muted-foreground">{theme.description}</p>
+                  </button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Preview Panel */}
-          <div className="lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)]">
-            <Card className="h-full flex flex-col">
-              <CardHeader className="flex-shrink-0">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">👀 Preview</CardTitle>
-                  <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
-                    <Button
-                      variant={previewMode === "desktop" ? "secondary" : "ghost"}
-                      size="sm"
-                      onClick={() => setPreviewMode("desktop")}
-                    >
-                      <Monitor className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant={previewMode === "mobile" ? "secondary" : "ghost"}
-                      size="sm"
-                      onClick={() => setPreviewMode("mobile")}
-                    >
-                      <Smartphone className="w-4 h-4" />
-                    </Button>
-                  </div>
+          <Card className="lg:sticky lg:top-24 lg:h-[calc(100vh-12rem)]">
+            <CardHeader className="flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg">👀 Preview</CardTitle>
+                <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
+                  <Button
+                    variant={previewMode === "desktop" ? "secondary" : "ghost"}
+                    size="sm"
+                    onClick={() => setPreviewMode("desktop")}
+                  >
+                    <Monitor className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant={previewMode === "mobile" ? "secondary" : "ghost"}
+                    size="sm"
+                    onClick={() => setPreviewMode("mobile")}
+                  >
+                    <Smartphone className="w-4 h-4" />
+                  </Button>
                 </div>
-              </CardHeader>
-              <CardContent className="flex-1 overflow-hidden p-4">
-                <div
-                  className={`h-full mx-auto bg-background rounded-lg overflow-hidden border shadow-lg ${
-                    previewMode === "mobile" ? "max-w-[375px]" : "w-full"
-                  }`}
-                >
-                  <ValentinePreview config={config} />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardHeader>
+            <CardContent className="flex-1 overflow-hidden p-4 h-[calc(100%-5rem)]">
+              <div
+                className={`h-full mx-auto bg-background rounded-lg overflow-hidden border shadow-lg ${
+                  previewMode === "mobile" ? "max-w-[375px]" : "w-full"
+                }`}
+              >
+                <ValentinePreview config={config} />
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
