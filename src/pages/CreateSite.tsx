@@ -214,27 +214,33 @@ export default function CreateSite() {
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Step 1: Template Selection */}
+        {/* Step 1: Template Selection - Horizontal on laptop */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="text-lg">🎨 Choose Template</CardTitle>
           </CardHeader>
           <CardContent>
-            <TemplateSelector
-              selected={config.template}
-              onSelect={(template) => setConfig({ ...config, template })}
-            />
+            <div className="lg:flex lg:gap-4">
+              <TemplateSelector
+                selected={config.template}
+                onSelect={(template) => setConfig({ ...config, template })}
+              />
+            </div>
           </CardContent>
         </Card>
 
-        {/* Top Section: URL and Text */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* URL Slug */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Your URL</CardTitle>
-            </CardHeader>
-            <CardContent>
+        {/* URL & Security Section - Combined */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Lock className="w-5 h-5" />
+              🔗 URL & Security
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* URL Slug */}
+            <div>
+              <Label className="text-sm font-medium mb-2 block">Your URL</Label>
               <div className="flex items-center gap-2">
                 <span className="text-muted-foreground text-sm">/</span>
                 <Input
@@ -250,82 +256,92 @@ export default function CreateSite() {
               <p className="text-xs text-muted-foreground mt-2">
                 This will be your shareable link
               </p>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Text Customization */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">✏️ Text</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+            {/* Password Protection */}
+            <div className="pt-4 border-t border-border">
+              <PasswordProtectionConfig
+                enabled={config.passwordProtected}
+                onEnabledChange={(enabled) => setConfig({ ...config, passwordProtected: enabled })}
+                password={config.password}
+                onPasswordChange={(password) => setConfig({ ...config, password })}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Text Customization */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-lg">✏️ Text</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="headline">Headline</Label>
+                <Input
+                  id="headline"
+                  value={config.headline}
+                  onChange={(e) => setConfig({ ...config, headline: e.target.value })}
+                  placeholder="Will You Be My Valentine?"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="subtext">Subtext</Label>
+                <Input
+                  id="subtext"
+                  value={config.subtext}
+                  onChange={(e) => setConfig({ ...config, subtext: e.target.value })}
+                  placeholder="I really like you..."
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="yes-btn">Yes Button</Label>
+                <Input
+                  id="yes-btn"
+                  value={config.yesButtonText}
+                  onChange={(e) => setConfig({ ...config, yesButtonText: e.target.value })}
+                  placeholder="Yes! 💕"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="no-btn">No Button</Label>
+                <Input
+                  id="no-btn"
+                  value={config.noButtonText}
+                  onChange={(e) => setConfig({ ...config, noButtonText: e.target.value })}
+                  placeholder="No"
+                />
+              </div>
+            </div>
+            {/* Success State Text */}
+            <div className="pt-3 border-t border-border">
+              <p className="text-sm text-muted-foreground mb-3">After clicking "Yes":</p>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="headline">Headline</Label>
+                  <Label htmlFor="success-headline">Success Headline</Label>
                   <Input
-                    id="headline"
-                    value={config.headline}
-                    onChange={(e) => setConfig({ ...config, headline: e.target.value })}
-                    placeholder="Will You Be My Valentine?"
+                    id="success-headline"
+                    value={config.successHeadline}
+                    onChange={(e) => setConfig({ ...config, successHeadline: e.target.value })}
+                    placeholder="Yay! 🎉"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="subtext">Subtext</Label>
+                  <Label htmlFor="success-subtext">Success Message</Label>
                   <Input
-                    id="subtext"
-                    value={config.subtext}
-                    onChange={(e) => setConfig({ ...config, subtext: e.target.value })}
-                    placeholder="I really like you..."
+                    id="success-subtext"
+                    value={config.successSubtext}
+                    onChange={(e) => setConfig({ ...config, successSubtext: e.target.value })}
+                    placeholder="I knew you'd say yes! 💕"
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="yes-btn">Yes Button</Label>
-                  <Input
-                    id="yes-btn"
-                    value={config.yesButtonText}
-                    onChange={(e) => setConfig({ ...config, yesButtonText: e.target.value })}
-                    placeholder="Yes! 💕"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="no-btn">No Button</Label>
-                  <Input
-                    id="no-btn"
-                    value={config.noButtonText}
-                    onChange={(e) => setConfig({ ...config, noButtonText: e.target.value })}
-                    placeholder="No"
-                  />
-                </div>
-              </div>
-              {/* Success State Text */}
-              <div className="pt-3 border-t border-border">
-                <p className="text-sm text-muted-foreground mb-3">After clicking "Yes":</p>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="success-headline">Success Headline</Label>
-                    <Input
-                      id="success-headline"
-                      value={config.successHeadline}
-                      onChange={(e) => setConfig({ ...config, successHeadline: e.target.value })}
-                      placeholder="Yay! 🎉"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="success-subtext">Success Message</Label>
-                    <Input
-                      id="success-subtext"
-                      value={config.successSubtext}
-                      onChange={(e) => setConfig({ ...config, successSubtext: e.target.value })}
-                      placeholder="I knew you'd say yes! 💕"
-                    />
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Date Planning Section */}
         <Card className="mb-8">
@@ -356,24 +372,6 @@ export default function CreateSite() {
               </CardContent>
             </CollapsibleContent>
           </Collapsible>
-        </Card>
-
-        {/* Password Protection Section */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Lock className="w-5 h-5" />
-              🔒 Password Protection (Optional)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <PasswordProtectionConfig
-              enabled={config.passwordProtected}
-              onEnabledChange={(enabled) => setConfig({ ...config, passwordProtected: enabled })}
-              password={config.password}
-              onPasswordChange={(password) => setConfig({ ...config, password })}
-            />
-          </CardContent>
         </Card>
 
         {/* Personal Photos Section */}
