@@ -23,6 +23,7 @@ interface TemplatePreviewProps {
     theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
   };
   datePlanningConfig?: DatePlanningConfig;
+  backgroundPhotos?: string[];
   isLive?: boolean;
   onYesClick?: () => void;
   onDateFormSubmit?: (preferences: DatePreferences) => Promise<void>;
@@ -32,6 +33,7 @@ export default function TemplatePreview({
   template, 
   config, 
   datePlanningConfig,
+  backgroundPhotos,
   isLive = false, 
   onYesClick,
   onDateFormSubmit,
@@ -42,6 +44,7 @@ export default function TemplatePreview({
         <MemeGifPreview 
           config={config} 
           datePlanningConfig={datePlanningConfig}
+          backgroundPhotos={backgroundPhotos}
           isLive={isLive} 
           onYesClick={onYesClick}
           onDateFormSubmit={onDateFormSubmit}
@@ -52,6 +55,7 @@ export default function TemplatePreview({
         <TeddyBearPreview 
           config={config} 
           datePlanningConfig={datePlanningConfig}
+          backgroundPhotos={backgroundPhotos}
           isLive={isLive} 
           onYesClick={onYesClick}
           onDateFormSubmit={onDateFormSubmit}
@@ -63,6 +67,7 @@ export default function TemplatePreview({
         <ClassicPreview 
           config={config} 
           datePlanningConfig={datePlanningConfig}
+          backgroundPhotos={backgroundPhotos}
           isLive={isLive} 
           onYesClick={onYesClick}
           onDateFormSubmit={onDateFormSubmit}
