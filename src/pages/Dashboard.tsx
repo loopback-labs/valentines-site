@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heart, Plus, Eye, MousePointerClick, LogOut, Sparkles, ExternalLink, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-
 interface ValentineSite {
   id: string;
   slug: string;
@@ -18,24 +17,26 @@ interface ValentineSite {
   yes_count: number;
   created_at: string;
 }
-
 export default function Dashboard() {
-  const { user, loading, signOut } = useAuth();
+  const {
+    user,
+    loading,
+    signOut
+  } = useAuth();
   const [sites, setSites] = useState<ValentineSite[]>([]);
   const [loadingSites, setLoadingSites] = useState(true);
-
   useEffect(() => {
     if (user) {
       fetchSites();
     }
   }, [user]);
-
   const fetchSites = async () => {
-    const { data, error } = await supabase
-      .from("valentine_sites")
-      .select("*")
-      .order("created_at", { ascending: false });
-
+    const {
+      data,
+      error
+    } = await supabase.from("valentine_sites").select("*").order("created_at", {
+      ascending: false
+    });
     if (error) {
       toast.error("Failed to load your sites");
       console.error(error);
@@ -44,74 +45,69 @@ export default function Dashboard() {
     }
     setLoadingSites(false);
   };
-
   const handleSignOut = async () => {
     await signOut();
     toast.success("See you soon! 💕");
   };
-
   const deleteSite = async (siteId: string) => {
-    const { error } = await supabase
-      .from("valentine_sites")
-      .delete()
-      .eq("id", siteId);
-
+    const {
+      error
+    } = await supabase.from("valentine_sites").delete().eq("id", siteId);
     if (error) {
       toast.error("Failed to delete site");
     } else {
       toast.success("Site deleted");
-      setSites(sites.filter((s) => s.id !== siteId));
+      setSites(sites.filter(s => s.id !== siteId));
     }
   };
-
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+    return <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-pulse">
           <Heart className="w-16 h-16 text-primary animate-float" fill="currentColor" />
         </div>
-      </div>
-    );
+      </div>;
   }
-
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
-
   const themeEmojis: Record<string, string> = {
     cute: "💕",
     minimal: "⬜",
     dark: "🌙",
     pastel: "🍬",
-    chaotic: "🎪",
+    chaotic: "🎪"
   };
-
-  const templateLabels: Record<string, { name: string; emoji: string }> = {
-    classic: { name: "Classic", emoji: "💕" },
-    meme_gif: { name: "Meme GIF", emoji: "🐱" },
-    teddy_bear: { name: "Teddy Bear", emoji: "🧸" },
+  const templateLabels: Record<string, {
+    name: string;
+    emoji: string;
+  }> = {
+    classic: {
+      name: "Classic",
+      emoji: "💕"
+    },
+    meme_gif: {
+      name: "Meme GIF",
+      emoji: "🐱"
+    },
+    teddy_bear: {
+      name: "Teddy Bear",
+      emoji: "🧸"
+    }
   };
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/dashboard" className="flex items-center gap-2 hover-grow">
             <Heart className="w-8 h-8 text-primary" fill="currentColor" />
-            <span className="text-xl font-bold text-gradient-love bg-clip-text">Valentine Maker</span>
+            <span className="text-xl font-bold text-gradient-love bg-clip-text">Love Link</span>
           </Link>
 
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground hidden sm:block">
               {user.email}
             </span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleSignOut}
-              className="text-muted-foreground hover:text-foreground"
-            >
+            <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-muted-foreground hover:text-foreground">
               <LogOut className="w-4 h-4 mr-2" />
               Sign Out
             </Button>
@@ -185,10 +181,8 @@ export default function Dashboard() {
           </Button>
         </div>
 
-        {loadingSites ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="animate-pulse">
+        {loadingSites ? <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1, 2, 3].map(i => <Card key={i} className="animate-pulse">
                 <CardHeader>
                   <div className="h-6 bg-muted rounded w-3/4" />
                   <div className="h-4 bg-muted rounded w-1/2 mt-2" />
@@ -196,11 +190,8 @@ export default function Dashboard() {
                 <CardContent>
                   <div className="h-8 bg-muted rounded" />
                 </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : sites.length === 0 ? (
-          <Card className="border-dashed border-2 bg-muted/20">
+              </Card>)}
+          </div> : sites.length === 0 ? <Card className="border-dashed border-2 bg-muted/20">
             <CardContent className="flex flex-col items-center justify-center py-12">
               <div className="relative mb-4">
                 <Heart className="w-16 h-16 text-primary/30" />
@@ -217,11 +208,8 @@ export default function Dashboard() {
                 </Link>
               </Button>
             </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {sites.map((site) => (
-              <Card key={site.id} className="group hover:shadow-lg transition-shadow hover-grow">
+          </Card> : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {sites.map(site => <Card key={site.id} className="group hover:shadow-lg transition-shadow hover-grow">
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
@@ -235,11 +223,9 @@ export default function Dashboard() {
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground ml-2">
                           {templateLabels[site.template]?.emoji || "💕"} {templateLabels[site.template]?.name || "Classic"}
                         </span>
-                        {site.is_published && (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-accent text-accent-foreground ml-1">
+                        {site.is_published && <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-accent text-accent-foreground ml-1">
                             Live
-                          </span>
-                        )}
+                          </span>}
                       </CardDescription>
                     </div>
                   </div>
@@ -262,28 +248,18 @@ export default function Dashboard() {
                     <Button asChild variant="outline" size="sm">
                       <Link to={`/responses/${site.id}`}>Responses</Link>
                     </Button>
-                    {site.is_published && (
-                      <Button asChild variant="outline" size="sm">
+                    {site.is_published && <Button asChild variant="outline" size="sm">
                         <a href={`/${site.slug}`} target="_blank" rel="noopener noreferrer">
                           <ExternalLink className="w-4 h-4" />
                         </a>
-                      </Button>
-                    )}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => deleteSite(site.id)}
-                      className="text-destructive hover:text-destructive"
-                    >
+                      </Button>}
+                    <Button variant="outline" size="sm" onClick={() => deleteSite(site.id)} className="text-destructive hover:text-destructive">
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
                 </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+              </Card>)}
+          </div>}
       </main>
-    </div>
-  );
+    </div>;
 }
