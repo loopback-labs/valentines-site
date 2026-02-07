@@ -31,14 +31,25 @@ const noButtonVariants = [
   "You're breaking my heart ;(",
 ];
 
-// Teddy bear GIF
-const teddyBearGif = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcWJxNzN1ZGRsdXkwN2VqOHd0NXJxMWZoMnQ4OGJ4Y3RuOHB6dHZweSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3o7TKoWXm3okO1kgHC/giphy.gif";
+// Theme-specific neutral/default GIFs (same as Meme GIF template)
+const neutralGifsByTheme: Record<string, string> = {
+  cute: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZm1jN2tiem55bXBrbTlja3Q1MHNwc2wzM3podzd1OXYzejFvNXd0byZlcD12MV9naWZzX3NlYXJjaCZjdD1n/8QbwUh40Hl96yMgvOx/giphy.gif",
+  minimal: "https://media.giphy.com/media/mlvseq9yvZhba/giphy.gif",
+  dark: "https://media.giphy.com/media/VbnUQpnihPSIgIXuZv/giphy.gif",
+  pastel: "https://media.giphy.com/media/3oKIPnAiaMCws8nOsE/giphy.gif",
+  chaotic: "https://media.giphy.com/media/nR4L10XlJcSeQ/giphy.gif",
+};
 
-// Sad GIFs for No hover
+// Sad GIFs for No click - expanded variety
 const sadGifs = [
   "https://media.giphy.com/media/BEob5qwFkSJ7G/giphy.gif",
   "https://media.giphy.com/media/OPU6wzx8JrHna/giphy.gif",
   "https://media.giphy.com/media/d2lcHJTG5Tscg/giphy.gif",
+  "https://media.giphy.com/media/3o6wrvdHFbwBrUFenu/giphy.gif",
+  "https://media.giphy.com/media/ROF8OQvDmxytW/giphy.gif",
+  "https://media.giphy.com/media/L95W4wv8nnb9K/giphy.gif",
+  "https://media.giphy.com/media/2WxWfiavndgcM/giphy.gif",
+  "https://media.giphy.com/media/ISOckXUybVfQ4/giphy.gif",
 ];
 
 // Happy/celebration GIFs that cycle
@@ -203,11 +214,6 @@ export default function TeddyBearPreview({ config, isLive = false, onYesClick }:
 
   return (
     <div className={`h-full flex flex-col items-center justify-center p-4 ${holoClass} relative overflow-hidden`}>
-      {/* "All You Need Is Love" badge */}
-      <div className={`absolute top-4 right-4 ${styles.badge} px-3 py-1.5 rounded-full text-sm font-semibold shadow-lg`}>
-        All You Need Is Love 💕
-      </div>
-
       {/* Floating sad GIFs */}
       {floatingSadGifs.map((item) => (
         <div
@@ -220,11 +226,11 @@ export default function TeddyBearPreview({ config, isLive = false, onYesClick }:
       ))}
 
       <div className="max-w-md w-full text-center z-10">
-        {/* Teddy Bear GIF */}
+        {/* Theme-specific GIF */}
         <div className="w-48 h-48 mx-auto mb-6 rounded-2xl overflow-hidden shadow-2xl ring-4 ring-white/30">
           <img
-            src={teddyBearGif}
-            alt="Cute Teddy Bear"
+            src={neutralGifsByTheme[config.theme] || neutralGifsByTheme.cute}
+            alt="Valentine"
             className="w-full h-full object-cover"
           />
         </div>
