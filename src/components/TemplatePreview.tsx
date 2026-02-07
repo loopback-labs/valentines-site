@@ -10,6 +10,8 @@ interface TemplatePreviewProps {
     subtext: string;
     yesButtonText: string;
     noButtonText: string;
+    successHeadline?: string;
+    successSubtext?: string;
     theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
   };
   isLive?: boolean;
