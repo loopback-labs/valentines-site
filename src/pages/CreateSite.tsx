@@ -43,12 +43,12 @@ export default function CreateSite() {
 
   const [config, setConfig] = useState<SiteConfig>({
     template: "classic",
-    headline: "Will You Be My Valentine?",
-    subtext: "I really like you... 💕",
-    yesButtonText: "Yes! 💕",
-    noButtonText: "No",
-    successHeadline: "Yay! 🎉",
-    successSubtext: "I knew you'd say yes! 💕",
+    headline: "Will You Be My Valentine? 💘",
+    subtext: "I've been wanting to ask you this for a while...",
+    yesButtonText: "Yes, absolutely! 💕",
+    noButtonText: "Let me think...",
+    successHeadline: "You made my heart explode! 💥💖",
+    successSubtext: "I promise to make you smile every single day!",
     theme: "cute",
     slug: "",
   });
