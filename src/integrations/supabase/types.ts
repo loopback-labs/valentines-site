@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      date_preferences: {
+        Row: {
+          activity_preference: string
+          created_at: string
+          food_preference: string
+          id: string
+          selected_date: string
+          selected_time: string
+          site_id: string
+        }
+        Insert: {
+          activity_preference: string
+          created_at?: string
+          food_preference: string
+          id?: string
+          selected_date: string
+          selected_time: string
+          site_id: string
+        }
+        Update: {
+          activity_preference?: string
+          created_at?: string
+          food_preference?: string
+          id?: string
+          selected_date?: string
+          selected_time?: string
+          site_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "date_preferences_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "valentine_sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -75,7 +113,11 @@ export type Database = {
       }
       valentine_sites: {
         Row: {
+          activity_options: string[] | null
+          available_dates: string[] | null
           created_at: string
+          enable_date_planning: boolean
+          food_options: string[] | null
           headline: string
           id: string
           is_published: boolean
@@ -85,8 +127,11 @@ export type Database = {
           password_protected: boolean
           slug: string
           subtext: string | null
+          success_headline: string | null
+          success_subtext: string | null
           template: string
           theme: Database["public"]["Enums"]["site_theme"]
+          time_slots: string[] | null
           updated_at: string
           user_id: string
           view_count: number
@@ -94,7 +139,11 @@ export type Database = {
           yes_count: number
         }
         Insert: {
+          activity_options?: string[] | null
+          available_dates?: string[] | null
           created_at?: string
+          enable_date_planning?: boolean
+          food_options?: string[] | null
           headline?: string
           id?: string
           is_published?: boolean
@@ -104,8 +153,11 @@ export type Database = {
           password_protected?: boolean
           slug: string
           subtext?: string | null
+          success_headline?: string | null
+          success_subtext?: string | null
           template?: string
           theme?: Database["public"]["Enums"]["site_theme"]
+          time_slots?: string[] | null
           updated_at?: string
           user_id: string
           view_count?: number
@@ -113,7 +165,11 @@ export type Database = {
           yes_count?: number
         }
         Update: {
+          activity_options?: string[] | null
+          available_dates?: string[] | null
           created_at?: string
+          enable_date_planning?: boolean
+          food_options?: string[] | null
           headline?: string
           id?: string
           is_published?: boolean
@@ -123,8 +179,11 @@ export type Database = {
           password_protected?: boolean
           slug?: string
           subtext?: string | null
+          success_headline?: string | null
+          success_subtext?: string | null
           template?: string
           theme?: Database["public"]["Enums"]["site_theme"]
+          time_slots?: string[] | null
           updated_at?: string
           user_id?: string
           view_count?: number

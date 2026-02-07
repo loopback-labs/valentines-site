@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Heart } from "lucide-react";
+import DatePlanningForm, { DatePreferences } from "@/components/DatePlanningForm";
+import { DatePlanningConfig } from "@/components/TemplatePreview";
 
 interface ValentinePreviewProps {
   config: {
@@ -11,8 +13,10 @@ interface ValentinePreviewProps {
     successSubtext?: string;
     theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
   };
+  datePlanningConfig?: DatePlanningConfig;
   isLive?: boolean;
   onYesClick?: () => void;
+  onDateFormSubmit?: (preferences: DatePreferences) => Promise<void>;
 }
 
 const noButtonVariants = [
@@ -72,7 +76,13 @@ const themeStyles = {
   },
 };
 
-export default function ValentinePreview({ config, isLive = false, onYesClick }: ValentinePreviewProps) {
+export default function ValentinePreview({ 
+  config, 
+  datePlanningConfig,
+  isLive = false, 
+  onYesClick,
+  onDateFormSubmit,
+}: ValentinePreviewProps) {
   const [noIndex, setNoIndex] = useState(0);
   const [noPosition, setNoPosition] = useState({ x: 0, y: 0 });
   const [yesScale, setYesScale] = useState(1);
@@ -125,6 +135,9 @@ export default function ValentinePreview({ config, isLive = false, onYesClick }:
     setShowSuccess(false);
   }, [config.theme]);
 
+  const showDatePlanningForm = datePlanningConfig?.enableDatePlanning && 
+    datePlanningConfig.availableDates.length > 0;
+
   if (showSuccess) {
     return (
       <div className={`h-full flex flex-col items-center justify-center p-8 ${styles.bg} relative overflow-hidden`}>
@@ -144,16 +157,29 @@ export default function ValentinePreview({ config, isLive = false, onYesClick }:
           />
         ))}
         
-        <Heart
-          className={`w-24 h-24 ${styles.accent} animate-bounce mb-6`}
-          fill="currentColor"
-        />
-        <h1 className={`text-3xl md:text-4xl font-bold ${styles.text} text-center mb-4`}>
-          {config.successHeadline || "Yay! 🎉"}
-        </h1>
-        <p className={`text-xl ${styles.text} opacity-80 text-center`}>
-          {config.successSubtext || "I knew you'd say yes! 💕"}
-        </p>
+        <div className="flex flex-col items-center max-w-md w-full overflow-y-auto max-h-full py-4">
+          <Heart
+            className={`w-24 h-24 ${styles.accent} animate-bounce mb-6`}
+            fill="currentColor"
+          />
+          <h1 className={`text-3xl md:text-4xl font-bold ${styles.text} text-center mb-4`}>
+            {config.successHeadline || "Yay! 🎉"}
+          </h1>
+          <p className={`text-xl ${styles.text} opacity-80 text-center mb-6`}>
+            {config.successSubtext || "I knew you'd say yes! 💕"}
+          </p>
+
+          {showDatePlanningForm && onDateFormSubmit && (
+            <DatePlanningForm
+              availableDates={datePlanningConfig.availableDates}
+              timeSlots={datePlanningConfig.timeSlots}
+              foodOptions={datePlanningConfig.foodOptions}
+              activityOptions={datePlanningConfig.activityOptions}
+              onSubmit={onDateFormSubmit}
+              theme={config.theme}
+            />
+          )}
+        </div>
       </div>
     );
   }

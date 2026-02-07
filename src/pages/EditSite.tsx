@@ -6,11 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, ArrowLeft, Sparkles, Monitor, Smartphone, Check, Loader2 } from "lucide-react";
+import { Heart, ArrowLeft, Sparkles, Monitor, Smartphone, Check, Loader2, CalendarDays } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import TemplateSelector, { TemplateId } from "@/components/TemplateSelector";
 import TemplatePreview from "@/components/TemplatePreview";
+import DatePlanningConfig, { 
+  DEFAULT_TIME_SLOTS, 
+  DEFAULT_FOOD_OPTIONS, 
+  DEFAULT_ACTIVITY_OPTIONS 
+} from "@/components/DatePlanningConfig";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 type Theme = "cute" | "minimal" | "dark" | "pastel" | "chaotic";
 
@@ -25,6 +31,11 @@ interface SiteConfig {
   theme: Theme;
   slug: string;
   isPublished: boolean;
+  enableDatePlanning: boolean;
+  availableDates: Date[];
+  timeSlots: string[];
+  foodOptions: string[];
+  activityOptions: string[];
 }
 
 const themes: { id: Theme; name: string; emoji: string; description: string }[] = [
@@ -43,6 +54,7 @@ export default function EditSite() {
   const [isLoading, setIsLoading] = useState(true);
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
   const [notFound, setNotFound] = useState(false);
+  const [datePlanningOpen, setDatePlanningOpen] = useState(false);
 
   const [config, setConfig] = useState<SiteConfig>({
     template: "classic",
@@ -55,6 +67,11 @@ export default function EditSite() {
     theme: "cute",
     slug: "",
     isPublished: false,
+    enableDatePlanning: false,
+    availableDates: [],
+    timeSlots: [...DEFAULT_TIME_SLOTS],
+    foodOptions: [...DEFAULT_FOOD_OPTIONS],
+    activityOptions: [...DEFAULT_ACTIVITY_OPTIONS],
   });
 
   useEffect(() => {
@@ -89,12 +106,22 @@ export default function EditSite() {
       subtext: data.subtext || "",
       yesButtonText: data.yes_button_text,
       noButtonText: data.no_button_text,
-      successHeadline: "Yay! 🎉",
-      successSubtext: "I knew you'd say yes! 💕",
+      successHeadline: data.success_headline || "Yay! 🎉",
+      successSubtext: data.success_subtext || "I knew you'd say yes! 💕",
       theme: data.theme as Theme,
       slug: data.slug,
       isPublished: data.is_published,
+      enableDatePlanning: data.enable_date_planning || false,
+      availableDates: data.available_dates 
+        ? data.available_dates.map((d: string) => new Date(d)) 
+        : [],
+      timeSlots: data.time_slots || [...DEFAULT_TIME_SLOTS],
+      foodOptions: data.food_options || [...DEFAULT_FOOD_OPTIONS],
+      activityOptions: data.activity_options || [...DEFAULT_ACTIVITY_OPTIONS],
     });
+    if (data.enable_date_planning) {
+      setDatePlanningOpen(true);
+    }
     setIsLoading(false);
   };
 
@@ -127,6 +154,15 @@ export default function EditSite() {
         no_button_text: config.noButtonText,
         theme: config.theme,
         is_published: publish,
+        enable_date_planning: config.enableDatePlanning,
+        available_dates: config.availableDates.length > 0 
+          ? config.availableDates.map(d => d.toISOString().split('T')[0]) 
+          : null,
+        time_slots: config.timeSlots,
+        food_options: config.foodOptions,
+        activity_options: config.activityOptions,
+        success_headline: config.successHeadline,
+        success_subtext: config.successSubtext,
       })
       .eq("id", id);
 
@@ -294,6 +330,39 @@ export default function EditSite() {
           </Card>
         </div>
 
+        {/* Date Planning Section */}
+        <Card className="mb-8">
+          <Collapsible open={datePlanningOpen} onOpenChange={setDatePlanningOpen}>
+            <CollapsibleTrigger asChild>
+              <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <CalendarDays className="w-5 h-5" />
+                  📅 Date Planning (Optional)
+                  <span className="text-sm font-normal text-muted-foreground ml-auto">
+                    {datePlanningOpen ? "Click to collapse" : "Click to expand"}
+                  </span>
+                </CardTitle>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent>
+                <DatePlanningConfig
+                  enabled={config.enableDatePlanning}
+                  onEnabledChange={(enabled) => setConfig({ ...config, enableDatePlanning: enabled })}
+                  availableDates={config.availableDates}
+                  onAvailableDatesChange={(dates) => setConfig({ ...config, availableDates: dates })}
+                  timeSlots={config.timeSlots}
+                  onTimeSlotsChange={(slots) => setConfig({ ...config, timeSlots: slots })}
+                  foodOptions={config.foodOptions}
+                  onFoodOptionsChange={(options) => setConfig({ ...config, foodOptions: options })}
+                  activityOptions={config.activityOptions}
+                  onActivityOptionsChange={(options) => setConfig({ ...config, activityOptions: options })}
+                />
+              </CardContent>
+            </CollapsibleContent>
+          </Collapsible>
+        </Card>
+
         {/* Bottom Section: Themes (left) + Preview (right) */}
         <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8">
           {/* Theme Selection */}
@@ -356,7 +425,17 @@ export default function EditSite() {
                   previewMode === "mobile" ? "max-w-[375px]" : "w-full"
                 }`}
               >
-                <TemplatePreview template={config.template} config={config} />
+                <TemplatePreview 
+                  template={config.template} 
+                  config={config}
+                  datePlanningConfig={{
+                    enableDatePlanning: config.enableDatePlanning,
+                    availableDates: config.availableDates,
+                    timeSlots: config.timeSlots,
+                    foodOptions: config.foodOptions,
+                    activityOptions: config.activityOptions,
+                  }}
+                />
               </div>
             </CardContent>
           </Card>

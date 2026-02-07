@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import DatePlanningForm, { DatePreferences } from "@/components/DatePlanningForm";
+import { DatePlanningConfig } from "@/components/TemplatePreview";
 
 interface TeddyBearPreviewProps {
   config: {
@@ -10,8 +12,10 @@ interface TeddyBearPreviewProps {
     successSubtext?: string;
     theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
   };
+  datePlanningConfig?: DatePlanningConfig;
   isLive?: boolean;
   onYesClick?: () => void;
+  onDateFormSubmit?: (preferences: DatePreferences) => Promise<void>;
 }
 
 const noButtonVariants = [
@@ -109,7 +113,13 @@ const themeStyles = {
   },
 };
 
-export default function TeddyBearPreview({ config, isLive = false, onYesClick }: TeddyBearPreviewProps) {
+export default function TeddyBearPreview({ 
+  config, 
+  datePlanningConfig,
+  isLive = false, 
+  onYesClick,
+  onDateFormSubmit,
+}: TeddyBearPreviewProps) {
   const [noIndex, setNoIndex] = useState(0);
   const [yesScale, setYesScale] = useState(1);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -167,9 +177,12 @@ export default function TeddyBearPreview({ config, isLive = false, onYesClick }:
     setFloatingSadGifs([]);
   }, [config.theme]);
 
+  const showDatePlanningForm = datePlanningConfig?.enableDatePlanning && 
+    datePlanningConfig.availableDates.length > 0;
+
   if (showSuccess) {
     return (
-      <div className={`h-full flex flex-col items-center justify-center p-4 ${holoClass} relative overflow-hidden`}>
+      <div className={`h-full flex flex-col items-center justify-center p-4 ${holoClass} relative overflow-y-auto`}>
         {/* Marquee text */}
         <div className="absolute top-4 left-0 right-0 overflow-hidden">
           <div className="animate-marquee whitespace-nowrap">
@@ -180,7 +193,7 @@ export default function TeddyBearPreview({ config, isLive = false, onYesClick }:
           </div>
         </div>
 
-        <div className="text-center z-10">
+        <div className="text-center z-10 max-w-md w-full mt-12">
           <div className="w-56 h-56 mx-auto mb-6 rounded-2xl overflow-hidden shadow-2xl">
             <img
               src={happyGifs[currentHappyGif]}
@@ -191,9 +204,20 @@ export default function TeddyBearPreview({ config, isLive = false, onYesClick }:
           <h1 className={`text-3xl md:text-4xl font-bold ${styles.text} mb-3`}>
             {config.successHeadline || "Yay! You said Yes! 🎉"}
           </h1>
-          <p className={`text-xl ${styles.subtext}`}>
+          <p className={`text-xl ${styles.subtext} mb-6`}>
             {config.successSubtext || "I knew you couldn't resist! See you soon! 💕"}
           </p>
+
+          {showDatePlanningForm && onDateFormSubmit && (
+            <DatePlanningForm
+              availableDates={datePlanningConfig.availableDates}
+              timeSlots={datePlanningConfig.timeSlots}
+              foodOptions={datePlanningConfig.foodOptions}
+              activityOptions={datePlanningConfig.activityOptions}
+              onSubmit={onDateFormSubmit}
+              theme={config.theme}
+            />
+          )}
         </div>
 
         {/* Floating hearts */}
