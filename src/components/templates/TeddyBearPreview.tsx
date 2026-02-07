@@ -276,12 +276,12 @@ export default function TeddyBearPreview({
         </p>
 
         {/* Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="flex flex-col items-center justify-center gap-6">
           <div
             className="flex items-center justify-center transition-all"
             style={{
-              width: `${140 * yesScale}px`,
-              height: `${52 * yesScale}px`,
+              minWidth: `${140 * yesScale}px`,
+              minHeight: `${52 * yesScale}px`,
             }}
           >
             <button
