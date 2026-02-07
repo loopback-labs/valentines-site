@@ -17,6 +17,8 @@ import DatePlanningConfig, {
   DEFAULT_ACTIVITY_OPTIONS 
 } from "@/components/DatePlanningConfig";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { PasswordProtectionConfig } from "@/components/PasswordProtection";
+import { Lock } from "lucide-react";
 
 type Theme = "cute" | "minimal" | "dark" | "pastel" | "chaotic";
 
@@ -35,6 +37,8 @@ interface SiteConfig {
   timeSlots: string[];
   foodOptions: string[];
   activityOptions: string[];
+  passwordProtected: boolean;
+  password: string;
 }
 
 const themes: { id: Theme; name: string; emoji: string; description: string }[] = [
@@ -70,6 +74,8 @@ export default function EditSite() {
     timeSlots: [...DEFAULT_TIME_SLOTS],
     foodOptions: [...DEFAULT_FOOD_OPTIONS],
     activityOptions: [...DEFAULT_ACTIVITY_OPTIONS],
+    passwordProtected: false,
+    password: "",
   });
 
   useEffect(() => {
@@ -113,6 +119,8 @@ export default function EditSite() {
       timeSlots: data.time_slots || [...DEFAULT_TIME_SLOTS],
       foodOptions: data.food_options || [...DEFAULT_FOOD_OPTIONS],
       activityOptions: data.activity_options || [...DEFAULT_ACTIVITY_OPTIONS],
+      passwordProtected: data.password_protected || false,
+      password: data.password_hash || "",
     });
     if (data.enable_date_planning) {
       setDatePlanningOpen(true);
@@ -155,6 +163,8 @@ export default function EditSite() {
         activity_options: config.activityOptions,
         success_headline: config.successHeadline,
         success_subtext: config.successSubtext,
+        password_protected: config.passwordProtected && config.password.length > 0,
+        password_hash: config.passwordProtected && config.password.length > 0 ? config.password : null,
       })
       .eq("id", id);
 
@@ -351,6 +361,24 @@ export default function EditSite() {
               </CardContent>
             </CollapsibleContent>
           </Collapsible>
+        </Card>
+
+        {/* Password Protection Section */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Lock className="w-5 h-5" />
+              🔒 Password Protection (Optional)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PasswordProtectionConfig
+              enabled={config.passwordProtected}
+              onEnabledChange={(enabled) => setConfig({ ...config, passwordProtected: enabled })}
+              password={config.password}
+              onPasswordChange={(password) => setConfig({ ...config, password })}
+            />
+          </CardContent>
         </Card>
 
         {/* Bottom Section: Themes (left) + Preview (right) */}
