@@ -126,6 +126,28 @@ export default function Index() {
         </div>
       </section>
 
+      {/* Love Calculator CTA */}
+      <section className="py-12 px-4 bg-gradient-dreamy/10">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="bg-card p-8 rounded-2xl border shadow-lg">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Sparkles className="w-8 h-8 text-primary" />
+              <Heart className="w-6 h-6 text-primary" fill="currentColor" />
+            </div>
+            <h3 className="text-2xl font-bold mb-2">Curious about your compatibility?</h3>
+            <p className="text-muted-foreground mb-4">
+              Try our fun Love Calculator to see how strong your connection is! 💘
+            </p>
+            <Button asChild variant="outline" className="hover-grow">
+              <a href="https://crush-scale.lovable.app/" target="_blank" rel="noopener noreferrer">
+                <Heart className="w-4 h-4 mr-2" />
+                Try Love Calculator
+              </a>
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       
 
