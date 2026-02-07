@@ -52,17 +52,12 @@ export default function Index() {
                   <Sparkles className="w-5 h-5 mr-2" />
                   Go to Dashboard
                 </Link>
-              </Button> : <>
-                <Button asChild size="lg" className="h-14 px-8 text-lg bg-gradient-love hover:opacity-90 glow-pink hover-grow">
-                  <Link to="/auth">
-                    <Sparkles className="w-5 h-5 mr-2" />
-                    Create Your Site
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="lg" className="h-14 px-8 text-lg hover-grow">
-                  <Link to="/auth">Sign In</Link>
-                </Button>
-              </>}
+              </Button> : <Button asChild size="lg" className="h-14 px-8 text-lg bg-gradient-love hover:opacity-90 glow-pink hover-grow">
+                <Link to="/auth">
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  Create Your Site
+                </Link>
+              </Button>}
           </div>
 
           {/* Demo preview */}
