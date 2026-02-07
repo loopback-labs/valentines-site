@@ -1,0 +1,183 @@
+import { useState, useEffect } from "react";
+
+interface MemeGifPreviewProps {
+  config: {
+    headline: string;
+    subtext: string;
+    yesButtonText: string;
+    noButtonText: string;
+    theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
+  };
+  isLive?: boolean;
+  onYesClick?: () => void;
+}
+
+const noButtonVariants = [
+  "No",
+  "Are you sure?",
+  "Really sure?",
+  "Think again!",
+  "Last chance!",
+  "Surely not?",
+  "You might regret this!",
+  "Give it another thought!",
+  "Are you absolutely sure?",
+  "This could be a mistake!",
+  "Have a heart!",
+  "Don't be so cold!",
+  "Change of heart?",
+  "Wouldn't you reconsider?",
+  "Is that your final answer?",
+  "You're breaking my heart ;(",
+];
+
+// GIF URLs for different states (using placeholder cute cat GIFs)
+const gifStates = {
+  neutral: "https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif", // Cute pleading cat
+  sad: "https://media.giphy.com/media/BEob5qwFkSJ7G/giphy.gif", // Sad cat
+  happy: "https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif", // Happy celebration cat
+};
+
+const themeStyles = {
+  cute: {
+    bg: "bg-gradient-to-br from-pink-50 via-white to-rose-50",
+    card: "bg-white/80 backdrop-blur border border-pink-200",
+    text: "text-pink-900",
+    subtext: "text-pink-700",
+    buttonYes: "bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white shadow-lg shadow-pink-500/25",
+    buttonNo: "bg-pink-100 hover:bg-pink-200 text-pink-700 border border-pink-300",
+  },
+  minimal: {
+    bg: "bg-white",
+    card: "bg-gray-50 border border-gray-200",
+    text: "text-gray-900",
+    subtext: "text-gray-600",
+    buttonYes: "bg-gray-900 hover:bg-gray-800 text-white",
+    buttonNo: "bg-white hover:bg-gray-100 text-gray-700 border border-gray-300",
+  },
+  dark: {
+    bg: "bg-gradient-to-br from-gray-900 via-purple-950 to-gray-900",
+    card: "bg-gray-800/50 backdrop-blur border border-purple-500/30",
+    text: "text-white",
+    subtext: "text-purple-200",
+    buttonYes: "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg shadow-purple-500/25",
+    buttonNo: "bg-gray-700 hover:bg-gray-600 text-purple-200 border border-purple-500/30",
+  },
+  pastel: {
+    bg: "bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100",
+    card: "bg-white/70 backdrop-blur border border-purple-200",
+    text: "text-purple-900",
+    subtext: "text-purple-700",
+    buttonYes: "bg-gradient-to-r from-purple-400 to-pink-400 hover:from-purple-500 hover:to-pink-500 text-white shadow-lg shadow-purple-400/25",
+    buttonNo: "bg-purple-100 hover:bg-purple-200 text-purple-700 border border-purple-300",
+  },
+  chaotic: {
+    bg: "bg-gradient-chaotic",
+    card: "bg-white/20 backdrop-blur-lg border border-white/30",
+    text: "text-white",
+    subtext: "text-white/80",
+    buttonYes: "bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 hover:from-yellow-500 hover:via-pink-600 hover:to-purple-600 text-white animate-pulse shadow-lg",
+    buttonNo: "bg-white/20 hover:bg-white/30 text-white border border-white/40",
+  },
+};
+
+export default function MemeGifPreview({ config, isLive = false, onYesClick }: MemeGifPreviewProps) {
+  const [noIndex, setNoIndex] = useState(0);
+  const [yesScale, setYesScale] = useState(1);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [gifState, setGifState] = useState<"neutral" | "sad" | "happy">("neutral");
+
+  const styles = themeStyles[config.theme];
+
+  const handleNoClick = () => {
+    setNoIndex((prev) => Math.min(prev + 1, noButtonVariants.length - 1));
+    setYesScale((prev) => Math.min(prev + 0.15, 2.5));
+    setGifState("sad");
+  };
+
+  const handleYesClick = () => {
+    setShowSuccess(true);
+    setGifState("happy");
+    if (onYesClick) onYesClick();
+  };
+
+  // Reset on config change (for preview)
+  useEffect(() => {
+    setNoIndex(0);
+    setYesScale(1);
+    setShowSuccess(false);
+    setGifState("neutral");
+  }, [config.theme]);
+
+  if (showSuccess) {
+    return (
+      <div className={`h-full flex flex-col items-center justify-center p-4 ${styles.bg}`}>
+        <div className={`max-w-md w-full ${styles.card} rounded-2xl p-6 text-center`}>
+          <div className="w-48 h-48 mx-auto mb-4 rounded-xl overflow-hidden">
+            <img
+              src={gifStates.happy}
+              alt="Celebration"
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <h1 className={`text-2xl md:text-3xl font-bold ${styles.text} mb-2`}>
+            Yay! 🎉
+          </h1>
+          <p className={`text-lg ${styles.subtext}`}>
+            I knew you'd say yes! See you soon! 💕
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`h-full flex flex-col items-center justify-center p-4 ${styles.bg}`}>
+      <div className={`max-w-md w-full ${styles.card} rounded-2xl p-6`}>
+        {/* GIF Banner */}
+        <div className="w-full aspect-square max-w-[200px] mx-auto mb-6 rounded-xl overflow-hidden">
+          <img
+            src={gifStates[gifState]}
+            alt="Valentine"
+            className="w-full h-full object-cover"
+          />
+        </div>
+
+        {/* Text */}
+        <div className="text-center mb-6">
+          <h1 className={`text-xl md:text-2xl font-bold ${styles.text} mb-2`}>
+            {config.headline || "Will You Be My Valentine?"}
+          </h1>
+          <p className={`${styles.subtext}`}>
+            {config.subtext || "I really like you... 💕"}
+          </p>
+        </div>
+
+        {/* Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <button
+            onClick={handleYesClick}
+            className={`px-6 py-3 rounded-full font-semibold transition-all ${styles.buttonYes}`}
+            style={{ 
+              transform: `scale(${yesScale})`,
+              zIndex: 10,
+            }}
+          >
+            {config.yesButtonText || "Yes! 💕"}
+          </button>
+
+          <button
+            onClick={handleNoClick}
+            className={`px-6 py-3 rounded-full font-semibold transition-all ${styles.buttonNo}`}
+            style={{
+              transform: `scale(${Math.max(0.7, 1 - noIndex * 0.05)})`,
+              opacity: Math.max(0.5, 1 - noIndex * 0.03),
+            }}
+          >
+            {noButtonVariants[noIndex] || config.noButtonText || "No"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
