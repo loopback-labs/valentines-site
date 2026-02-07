@@ -137,7 +137,6 @@ export default function MemeGifPreview({
   }, [config.theme]);
 
   const showDatePlanningForm = datePlanningConfig?.enableDatePlanning && 
-    datePlanningConfig.availableDates.length > 0 &&
     datePlanningConfig.timeSlots.length > 0;
   
   const handleDateFormSubmit = onDateFormSubmit || (async () => {
@@ -165,7 +164,6 @@ export default function MemeGifPreview({
 
           {showDatePlanningForm && (
             <DatePlanningForm
-              availableDates={datePlanningConfig.availableDates}
               timeSlots={datePlanningConfig.timeSlots}
               foodOptions={datePlanningConfig.foodOptions}
               activityOptions={datePlanningConfig.activityOptions}

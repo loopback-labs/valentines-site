@@ -6,7 +6,6 @@ import { DatePreferences } from "./DatePlanningForm";
 
 export interface DatePlanningConfig {
   enableDatePlanning: boolean;
-  availableDates: Date[];
   timeSlots: string[];
   foodOptions: string[];
   activityOptions: string[];
