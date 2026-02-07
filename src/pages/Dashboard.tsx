@@ -99,7 +99,7 @@ export default function Dashboard() {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/dashboard" className="flex items-center gap-2 hover-grow">
             <Heart className="w-8 h-8 text-primary" fill="currentColor" />
-            <span className="text-xl font-bold text-gradient-love bg-clip-text">Valentine Maker</span>
+            <span className="text-xl font-bold text-gradient-love bg-clip-text">LoveLink</span>
           </Link>
 
           <div className="flex items-center gap-4">
