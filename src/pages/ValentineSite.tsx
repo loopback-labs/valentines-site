@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Heart, Loader2 } from "lucide-react";
@@ -24,41 +24,51 @@ interface SiteData {
   activity_options: string[] | null;
 }
 
+// Session storage keys for rate limiting
+const VIEWED_SITES_KEY = "lovelink_viewed_sites";
+const YES_CLICKED_SITES_KEY = "lovelink_yes_clicked_sites";
+
+// Helper to check if action was already performed this session
+const hasPerformedAction = (storageKey: string, siteId: string): boolean => {
+  try {
+    const stored = sessionStorage.getItem(storageKey);
+    if (!stored) return false;
+    const sites: string[] = JSON.parse(stored);
+    return sites.includes(siteId);
+  } catch {
+    return false;
+  }
+};
+
+// Helper to mark action as performed
+const markActionPerformed = (storageKey: string, siteId: string): void => {
+  try {
+    const stored = sessionStorage.getItem(storageKey);
+    const sites: string[] = stored ? JSON.parse(stored) : [];
+    if (!sites.includes(siteId)) {
+      sites.push(siteId);
+      sessionStorage.setItem(storageKey, JSON.stringify(sites));
+    }
+  } catch {
+    // Silently fail if sessionStorage is unavailable
+  }
+};
+
 export default function ValentineSite() {
   const { slug } = useParams<{ slug: string }>();
   const [site, setSite] = useState<SiteData | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
-  const [viewTracked, setViewTracked] = useState(false);
 
-  useEffect(() => {
-    if (slug) {
-      fetchSite();
+  const trackView = useCallback(async (siteId: string) => {
+    // Check if already viewed this session (rate limiting)
+    if (hasPerformedAction(VIEWED_SITES_KEY, siteId)) {
+      return;
     }
-  }, [slug]);
 
-  const fetchSite = async () => {
-    const { data, error } = await supabase
-      .from("valentine_sites")
-      .select("*")
-      .eq("slug", slug)
-      .eq("is_published", true)
-      .maybeSingle();
+    // Mark as viewed before making requests
+    markActionPerformed(VIEWED_SITES_KEY, siteId);
 
-    if (error || !data) {
-      setNotFound(true);
-    } else {
-      setSite(data as SiteData);
-      // Track view
-      if (!viewTracked) {
-        trackView(data.id);
-        setViewTracked(true);
-      }
-    }
-    setLoading(false);
-  };
-
-  const trackView = async (siteId: string) => {
     // Insert view response
     await supabase.from("site_responses").insert({
       site_id: siteId,
@@ -71,10 +81,61 @@ export default function ValentineSite() {
     } catch {
       // RPC might not exist yet, silently fail
     }
+  }, []);
+
+  useEffect(() => {
+    if (slug) {
+      fetchSite();
+    }
+  }, [slug]);
+
+  const fetchSite = async () => {
+    // Query only the fields we need, explicitly excluding user_id for privacy
+    const { data, error } = await supabase
+      .from("valentine_sites")
+      .select(`
+        id,
+        slug,
+        headline,
+        subtext,
+        yes_button_text,
+        no_button_text,
+        template,
+        theme,
+        is_published,
+        enable_date_planning,
+        available_dates,
+        time_slots,
+        food_options,
+        activity_options,
+        success_headline,
+        success_subtext,
+        password_protected
+      `)
+      .eq("slug", slug)
+      .eq("is_published", true)
+      .maybeSingle();
+
+    if (error || !data) {
+      setNotFound(true);
+    } else {
+      setSite(data as SiteData);
+      // Track view with session-based deduplication
+      trackView(data.id);
+    }
+    setLoading(false);
   };
 
   const handleYesClick = async () => {
     if (!site) return;
+
+    // Check if already clicked yes this session (rate limiting)
+    if (hasPerformedAction(YES_CLICKED_SITES_KEY, site.id)) {
+      return;
+    }
+
+    // Mark as clicked before making requests
+    markActionPerformed(YES_CLICKED_SITES_KEY, site.id);
 
     await supabase.from("site_responses").insert({
       site_id: site.id,
