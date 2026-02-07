@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heart, Plus, Eye, MousePointerClick, LogOut, Sparkles, ExternalLink, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import Footer from "@/components/Footer";
 
 interface ValentineSite {
   id: string;
@@ -260,9 +259,6 @@ export default function Dashboard() {
                     <Button asChild variant="outline" size="sm" className="flex-1">
                       <Link to={`/edit/${site.id}`}>Edit</Link>
                     </Button>
-                    <Button asChild variant="outline" size="sm">
-                      <Link to={`/responses/${site.id}`}>Responses</Link>
-                    </Button>
                     {site.is_published && (
                       <Button asChild variant="outline" size="sm">
                         <a href={`/${site.slug}`} target="_blank" rel="noopener noreferrer">
@@ -285,8 +281,6 @@ export default function Dashboard() {
           </div>
         )}
       </main>
-
-      <Footer />
     </div>
   );
 }

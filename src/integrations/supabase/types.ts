@@ -115,7 +115,6 @@ export type Database = {
         Row: {
           activity_options: string[] | null
           available_dates: string[] | null
-          background_photos: string[] | null
           created_at: string
           enable_date_planning: boolean
           food_options: string[] | null
@@ -126,7 +125,6 @@ export type Database = {
           no_button_variants: string[] | null
           password_hash: string | null
           password_protected: boolean
-          photo_display_mode: string | null
           slug: string
           subtext: string | null
           success_headline: string | null
@@ -143,7 +141,6 @@ export type Database = {
         Insert: {
           activity_options?: string[] | null
           available_dates?: string[] | null
-          background_photos?: string[] | null
           created_at?: string
           enable_date_planning?: boolean
           food_options?: string[] | null
@@ -154,7 +151,6 @@ export type Database = {
           no_button_variants?: string[] | null
           password_hash?: string | null
           password_protected?: boolean
-          photo_display_mode?: string | null
           slug: string
           subtext?: string | null
           success_headline?: string | null
@@ -171,7 +167,6 @@ export type Database = {
         Update: {
           activity_options?: string[] | null
           available_dates?: string[] | null
-          background_photos?: string[] | null
           created_at?: string
           enable_date_planning?: boolean
           food_options?: string[] | null
@@ -182,7 +177,6 @@ export type Database = {
           no_button_variants?: string[] | null
           password_hash?: string | null
           password_protected?: boolean
-          photo_display_mode?: string | null
           slug?: string
           subtext?: string | null
           success_headline?: string | null

@@ -5,8 +5,6 @@ import { Heart, Loader2 } from "lucide-react";
 import TemplatePreview from "@/components/TemplatePreview";
 import { TemplateId } from "@/components/TemplateSelector";
 import { DatePreferences } from "@/components/DatePlanningForm";
-import { PasswordEntryScreen } from "@/components/PasswordProtection";
-import { PhotoDisplayMode } from "@/components/PhotoUploadConfig";
 
 interface SiteData {
   id: string;
@@ -19,14 +17,11 @@ interface SiteData {
   success_subtext: string | null;
   theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
   password_protected: boolean;
-  password_hash: string | null;
   enable_date_planning: boolean;
   available_dates: string[] | null;
   time_slots: string[] | null;
   food_options: string[] | null;
   activity_options: string[] | null;
-  background_photos: string[] | null;
-  photo_display_mode: string | null;
 }
 
 export default function ValentineSite() {
@@ -35,9 +30,6 @@ export default function ValentineSite() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [viewTracked, setViewTracked] = useState(false);
-  const [isUnlocked, setIsUnlocked] = useState(false);
-  const [passwordError, setPasswordError] = useState("");
-  const [checkingPassword, setCheckingPassword] = useState(false);
 
   useEffect(() => {
     if (slug) {
@@ -57,39 +49,13 @@ export default function ValentineSite() {
       setNotFound(true);
     } else {
       setSite(data as SiteData);
-      // If not password protected, auto-unlock
-      if (!data.password_protected) {
-        setIsUnlocked(true);
-        // Track view immediately for non-protected sites
-        if (!viewTracked) {
-          trackView(data.id);
-          setViewTracked(true);
-        }
+      // Track view
+      if (!viewTracked) {
+        trackView(data.id);
+        setViewTracked(true);
       }
     }
     setLoading(false);
-  };
-
-  const handlePasswordSubmit = (enteredPassword: string) => {
-    if (!site) return;
-    
-    setCheckingPassword(true);
-    setPasswordError("");
-    
-    // Simple password check (comparing plain text for now)
-    // In production, you'd want to hash and compare server-side
-    if (enteredPassword === site.password_hash) {
-      setIsUnlocked(true);
-      // Track view after successful unlock
-      if (!viewTracked) {
-        trackView(site.id);
-        setViewTracked(true);
-      }
-    } else {
-      setPasswordError("Incorrect password. Please try again.");
-    }
-    
-    setCheckingPassword(false);
   };
 
   const trackView = async (siteId: string) => {
@@ -157,17 +123,10 @@ export default function ValentineSite() {
 
   if (!site) return null;
 
-  // Show password screen if protected and not unlocked
-  if (site.password_protected && !isUnlocked) {
-    return (
-      <PasswordEntryScreen
-        onSubmit={handlePasswordSubmit}
-        error={passwordError}
-        isLoading={checkingPassword}
-        theme={site.theme}
-      />
-    );
-  }
+  // Parse available dates from string array to Date objects
+  const availableDates = site.available_dates 
+    ? site.available_dates.map(d => new Date(d))
+    : [];
 
   return (
     <div className="h-screen w-screen overflow-hidden">
@@ -184,12 +143,11 @@ export default function ValentineSite() {
         }}
         datePlanningConfig={{
           enableDatePlanning: site.enable_date_planning,
+          availableDates: availableDates,
           timeSlots: site.time_slots || [],
           foodOptions: site.food_options || [],
           activityOptions: site.activity_options || [],
         }}
-        backgroundPhotos={site.background_photos || undefined}
-        photoDisplayMode={(site.photo_display_mode as PhotoDisplayMode) || "background"}
         isLive
         onYesClick={handleYesClick}
         onDateFormSubmit={handleDateFormSubmit}

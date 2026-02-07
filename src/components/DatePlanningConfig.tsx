@@ -2,9 +2,14 @@ import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { X, Plus } from "lucide-react";
+import { CalendarIcon, X, Plus } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 export const DEFAULT_TIME_SLOTS = [
   "7-10 AM",
@@ -34,6 +39,8 @@ export const DEFAULT_ACTIVITY_OPTIONS = [
 interface DatePlanningConfigProps {
   enabled: boolean;
   onEnabledChange: (enabled: boolean) => void;
+  availableDates: Date[];
+  onAvailableDatesChange: (dates: Date[]) => void;
   timeSlots: string[];
   onTimeSlotsChange: (slots: string[]) => void;
   foodOptions: string[];
@@ -45,6 +52,8 @@ interface DatePlanningConfigProps {
 export default function DatePlanningConfig({
   enabled,
   onEnabledChange,
+  availableDates,
+  onAvailableDatesChange,
   timeSlots,
   onTimeSlotsChange,
   foodOptions,
@@ -56,6 +65,27 @@ export default function DatePlanningConfig({
   const [newFoodOption, setNewFoodOption] = useState("");
   const [newActivityOption, setNewActivityOption] = useState("");
 
+  const handleDateSelect = (date: Date | undefined) => {
+    if (!date) return;
+    
+    const exists = availableDates.some(
+      d => d.toDateString() === date.toDateString()
+    );
+    
+    if (exists) {
+      onAvailableDatesChange(
+        availableDates.filter(d => d.toDateString() !== date.toDateString())
+      );
+    } else {
+      onAvailableDatesChange([...availableDates, date]);
+    }
+  };
+
+  const removeDate = (date: Date) => {
+    onAvailableDatesChange(
+      availableDates.filter(d => d.toDateString() !== date.toDateString())
+    );
+  };
 
   const toggleArrayItem = (
     array: string[],
@@ -116,17 +146,58 @@ export default function DatePlanningConfig({
 
       {enabled && (
         <div className="space-y-6 pt-4 border-t border-border">
-          {/* Date Selection Info */}
-          <div className="rounded-lg bg-muted/50 p-4 border border-border">
-            <div className="flex items-start gap-3">
-              <div className="mt-0.5 text-primary">📅</div>
-              <div>
-                <p className="text-sm font-medium">Date Selection</p>
-                <p className="text-xs text-muted-foreground">
-                  Visitors will see a date picker to choose any future date for the date
-                </p>
+          {/* Available Dates */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium">Available Dates</Label>
+            <p className="text-xs text-muted-foreground">
+              Select which dates you're available for the date
+            </p>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="w-full justify-start text-left font-normal">
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {availableDates.length > 0 
+                    ? `${availableDates.length} date(s) selected` 
+                    : "Pick dates..."}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={undefined}
+                  onSelect={handleDateSelect}
+                  disabled={(date) => date < new Date()}
+                  modifiers={{
+                    selected: availableDates,
+                  }}
+                  modifiersStyles={{
+                    selected: {
+                      backgroundColor: "hsl(var(--primary))",
+                      color: "hsl(var(--primary-foreground))",
+                    },
+                  }}
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
+            {availableDates.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {availableDates
+                  .sort((a, b) => a.getTime() - b.getTime())
+                  .map((date) => (
+                    <Badge key={date.toISOString()} variant="secondary" className="gap-1">
+                      {format(date, "MMM d, yyyy")}
+                      <button
+                        type="button"
+                        onClick={() => removeDate(date)}
+                        className="ml-1 hover:text-destructive"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
               </div>
-            </div>
+            )}
           </div>
 
           {/* Time Slots */}
