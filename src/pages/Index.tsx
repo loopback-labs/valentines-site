@@ -2,12 +2,12 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Heart, Sparkles, Zap, Share2, BarChart3 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-
 export default function Index() {
-  const { user, loading } = useAuth();
-
-  return (
-    <div className="min-h-screen bg-background overflow-hidden">
+  const {
+    user,
+    loading
+  } = useAuth();
+  return <div className="min-h-screen bg-background overflow-hidden">
       {/* Hero Section */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-4 py-20">
         {/* Background gradient */}
@@ -15,21 +15,14 @@ export default function Index() {
         
         {/* Floating hearts */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(20)].map((_, i) => (
-            <Heart
-              key={i}
-              className="absolute text-primary opacity-10 animate-float"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                width: `${20 + Math.random() * 40}px`,
-                height: `${20 + Math.random() * 40}px`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${3 + Math.random() * 2}s`,
-              }}
-              fill="currentColor"
-            />
-          ))}
+          {[...Array(20)].map((_, i) => <Heart key={i} className="absolute text-primary opacity-10 animate-float" style={{
+          left: `${Math.random() * 100}%`,
+          top: `${Math.random() * 100}%`,
+          width: `${20 + Math.random() * 40}px`,
+          height: `${20 + Math.random() * 40}px`,
+          animationDelay: `${Math.random() * 3}s`,
+          animationDuration: `${3 + Math.random() * 2}s`
+        }} fill="currentColor" />)}
         </div>
 
         {/* Content */}
@@ -52,43 +45,24 @@ export default function Index() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-            {loading ? (
-              <Button size="lg" disabled className="h-14 px-8 text-lg">
+            {loading ? <Button size="lg" disabled className="h-14 px-8 text-lg">
                 Loading...
-              </Button>
-            ) : user ? (
-              <Button
-                asChild
-                size="lg"
-                className="h-14 px-8 text-lg bg-gradient-love hover:opacity-90 glow-pink hover-grow"
-              >
+              </Button> : user ? <Button asChild size="lg" className="h-14 px-8 text-lg bg-gradient-love hover:opacity-90 glow-pink hover-grow">
                 <Link to="/dashboard">
                   <Sparkles className="w-5 h-5 mr-2" />
                   Go to Dashboard
                 </Link>
-              </Button>
-            ) : (
-              <>
-                <Button
-                  asChild
-                  size="lg"
-                  className="h-14 px-8 text-lg bg-gradient-love hover:opacity-90 glow-pink hover-grow"
-                >
+              </Button> : <>
+                <Button asChild size="lg" className="h-14 px-8 text-lg bg-gradient-love hover:opacity-90 glow-pink hover-grow">
                   <Link to="/auth">
                     <Sparkles className="w-5 h-5 mr-2" />
                     Create Your Site
                   </Link>
                 </Button>
-                <Button
-                  asChild
-                  variant="outline"
-                  size="lg"
-                  className="h-14 px-8 text-lg hover-grow"
-                >
+                <Button asChild variant="outline" size="lg" className="h-14 px-8 text-lg hover-grow">
                   <Link to="/auth">Sign In</Link>
                 </Button>
-              </>
-            )}
+              </>}
           </div>
 
           {/* Demo preview */}
@@ -108,9 +82,7 @@ export default function Index() {
                 </span>
               </div>
             </div>
-            <p className="text-sm text-muted-foreground mt-4">
-              👆 The "No" button runs away when you try to click it!
-            </p>
+            
           </div>
         </div>
       </section>
@@ -169,12 +141,7 @@ export default function Index() {
           <p className="text-xl text-white/90 mb-8">
             Create your Valentine site now and spread some love! ✨
           </p>
-          <Button
-            asChild
-            size="lg"
-            variant="secondary"
-            className="h-14 px-8 text-lg font-semibold hover-grow"
-          >
+          <Button asChild size="lg" variant="secondary" className="h-14 px-8 text-lg font-semibold hover-grow">
             <Link to="/auth">
               <Sparkles className="w-5 h-5 mr-2" />
               Get Started Free
@@ -195,6 +162,5 @@ export default function Index() {
           </p>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 }
