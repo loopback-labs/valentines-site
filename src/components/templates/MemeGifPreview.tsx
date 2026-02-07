@@ -251,9 +251,9 @@ export default function MemeGifPreview({
         </div>
 
         {/* Buttons */}
-        <div className="flex flex-row items-center justify-center gap-4">
+        <div className="flex flex-col items-center justify-center gap-4">
           <div 
-            className="flex items-center justify-center transition-all shrink-0"
+            className="flex items-center justify-center transition-all"
             style={{ 
               minWidth: `${120 * yesScale}px`,
               minHeight: `${48 * yesScale}px`,
@@ -272,7 +272,7 @@ export default function MemeGifPreview({
 
           <button
             onClick={handleNoClick}
-            className={`px-6 py-3 rounded-full font-semibold transition-all shrink-0 ${styles.buttonNo}`}
+            className={`px-6 py-3 rounded-full font-semibold transition-all ${styles.buttonNo}`}
             style={{
               transform: `scale(${Math.max(0.7, 1 - noIndex * 0.05)})`,
               opacity: Math.max(0.5, 1 - noIndex * 0.03),
