@@ -7,6 +7,8 @@ interface ValentinePreviewProps {
     subtext: string;
     yesButtonText: string;
     noButtonText: string;
+    successHeadline?: string;
+    successSubtext?: string;
     theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
   };
   isLive?: boolean;
@@ -147,10 +149,10 @@ export default function ValentinePreview({ config, isLive = false, onYesClick }:
           fill="currentColor"
         />
         <h1 className={`text-3xl md:text-4xl font-bold ${styles.text} text-center mb-4`}>
-          Yay! 🎉
+          {config.successHeadline || "Yay! 🎉"}
         </h1>
         <p className={`text-xl ${styles.text} opacity-80 text-center`}>
-          I knew you'd say yes! 💕
+          {config.successSubtext || "I knew you'd say yes! 💕"}
         </p>
       </div>
     );
