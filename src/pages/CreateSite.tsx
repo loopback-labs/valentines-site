@@ -382,7 +382,7 @@ export default function CreateSite() {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <ImagePlus className="w-5 h-5" />
-              📷 Personal Photos (Optional)
+              📷 Memories (Optional)
             </CardTitle>
           </CardHeader>
           <CardContent>
