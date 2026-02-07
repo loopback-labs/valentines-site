@@ -253,3 +253,138 @@
 .animate-confetti {
   animation: confetti-fall 3s ease-out forwards;
 }
+
+/* Holographic gradient backgrounds for Teddy Bear template */
+@keyframes holographic-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.bg-gradient-holographic-cute {
+  background: linear-gradient(
+    135deg,
+    hsl(330 100% 70%),
+    hsl(300 80% 65%),
+    hsl(280 90% 70%),
+    hsl(320 100% 65%),
+    hsl(330 100% 70%)
+  );
+  background-size: 400% 400%;
+  animation: holographic-shift 6s ease infinite;
+}
+
+.bg-gradient-holographic-minimal {
+  background: linear-gradient(
+    135deg,
+    hsl(0 0% 98%),
+    hsl(210 20% 95%),
+    hsl(200 30% 92%),
+    hsl(220 15% 96%),
+    hsl(0 0% 98%)
+  );
+  background-size: 400% 400%;
+  animation: holographic-shift 8s ease infinite;
+}
+
+.bg-gradient-holographic-dark {
+  background: linear-gradient(
+    135deg,
+    hsl(280 60% 25%),
+    hsl(260 70% 30%),
+    hsl(300 50% 28%),
+    hsl(320 60% 25%),
+    hsl(280 60% 25%)
+  );
+  background-size: 400% 400%;
+  animation: holographic-shift 6s ease infinite;
+}
+
+.bg-gradient-holographic-pastel {
+  background: linear-gradient(
+    135deg,
+    hsl(280 60% 85%),
+    hsl(330 50% 88%),
+    hsl(200 60% 88%),
+    hsl(260 50% 86%),
+    hsl(280 60% 85%)
+  );
+  background-size: 400% 400%;
+  animation: holographic-shift 7s ease infinite;
+}
+
+.bg-gradient-holographic-chaotic {
+  background: linear-gradient(
+    135deg,
+    hsl(45 100% 60%),
+    hsl(330 100% 65%),
+    hsl(180 100% 50%),
+    hsl(280 100% 65%),
+    hsl(15 100% 60%),
+    hsl(45 100% 60%)
+  );
+  background-size: 600% 600%;
+  animation: holographic-shift 3s ease infinite;
+}
+
+/* Float up animation for success hearts */
+@keyframes float-up {
+  0% {
+    transform: translateY(100vh) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-20vh) scale(1.2);
+    opacity: 0;
+  }
+}
+
+.animate-float-up {
+  animation: float-up 4s ease-out forwards;
+}
+
+/* Float and fade for sad GIFs */
+@keyframes float-fade {
+  0% {
+    transform: translateY(0) scale(0.5);
+    opacity: 0;
+  }
+  20% {
+    transform: translateY(-10px) scale(1);
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-40px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+.animate-float-fade {
+  animation: float-fade 3s ease-out forwards;
+}
+
+/* Marquee animation for success state */
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 8s linear infinite;
+}
