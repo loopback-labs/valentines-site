@@ -120,10 +120,6 @@ export function PhotoUploadConfig({
     toast.success("Photo removed");
   };
   return <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        
-        <Switch id="photo-bg-toggle" checked={enabled} onCheckedChange={onEnabledChange} />
-      </div>
 
       {enabled && <div className="space-y-6 pt-2">
           {/* Display Mode Selector */}
