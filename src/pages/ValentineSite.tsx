@@ -102,7 +102,7 @@ export default function ValentineSite() {
   if (!site) return null;
 
   return (
-    <div className="min-h-screen">
+    <div className="h-screen w-screen overflow-hidden">
       <ValentinePreview
         config={{
           headline: site.headline,
