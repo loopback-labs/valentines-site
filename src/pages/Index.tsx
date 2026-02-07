@@ -2,27 +2,34 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Heart, Sparkles, Zap, Share2, BarChart3 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+
 export default function Index() {
-  const {
-    user,
-    loading
-  } = useAuth();
-  return <div className="min-h-screen bg-background overflow-hidden">
+  const { user, loading } = useAuth();
+
+  return (
+    <div className="min-h-screen bg-background overflow-hidden">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 py-20">
+      <section className="relative min-h-[90vh] flex flex-col items-center justify-center px-4 py-20">
         {/* Background gradient */}
         <div className="absolute inset-0 bg-gradient-love opacity-10" />
-        
+
         {/* Floating hearts */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(20)].map((_, i) => <Heart key={i} className="absolute text-primary opacity-10 animate-float" style={{
-          left: `${Math.random() * 100}%`,
-          top: `${Math.random() * 100}%`,
-          width: `${20 + Math.random() * 40}px`,
-          height: `${20 + Math.random() * 40}px`,
-          animationDelay: `${Math.random() * 3}s`,
-          animationDuration: `${3 + Math.random() * 2}s`
-        }} fill="currentColor" />)}
+          {[...Array(20)].map((_, i) => (
+            <Heart
+              key={i}
+              className="absolute text-primary opacity-10 animate-float"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                width: `${20 + Math.random() * 40}px`,
+                height: `${20 + Math.random() * 40}px`,
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${3 + Math.random() * 2}s`,
+              }}
+              fill="currentColor"
+            />
+          ))}
         </div>
 
         {/* Content */}
@@ -39,25 +46,39 @@ export default function Index() {
           </h1>
 
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Create the cutest "Will You Be My Valentine?" website where 
+            Create the cutest "Will You Be My Valentine?" website where
             <span className="text-primary font-semibold"> No is not an option! </span>
             💕
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-            {loading ? <Button size="lg" disabled className="h-14 px-8 text-lg">
+            {loading ? (
+              <Button size="lg" disabled className="h-14 px-8 text-lg">
                 Loading...
-              </Button> : user ? <Button asChild size="lg" className="h-14 px-8 text-lg bg-gradient-love hover:opacity-90 glow-pink hover-grow">
+              </Button>
+            ) : user ? (
+              <Button
+                asChild
+                size="lg"
+                className="h-14 px-8 text-lg bg-gradient-love hover:opacity-90 glow-pink hover-grow"
+              >
                 <Link to="/dashboard">
                   <Sparkles className="w-5 h-5 mr-2" />
                   Go to Dashboard
                 </Link>
-              </Button> : <Button asChild size="lg" className="h-14 px-8 text-lg bg-gradient-love hover:opacity-90 glow-pink hover-grow">
+              </Button>
+            ) : (
+              <Button
+                asChild
+                size="lg"
+                className="h-14 px-8 text-lg bg-gradient-love hover:opacity-90 glow-pink hover-grow"
+              >
                 <Link to="/auth">
                   <Sparkles className="w-5 h-5 mr-2" />
                   Create Your Site
                 </Link>
-              </Button>}
+              </Button>
+            )}
           </div>
 
           {/* Demo preview */}
@@ -77,7 +98,28 @@ export default function Index() {
                 </span>
               </div>
             </div>
-            
+          </div>
+        </div>
+      </section>
+
+      {/* Love Calculator CTA */}
+      <section className="py-8 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="bg-card/80 backdrop-blur-sm p-6 rounded-2xl border shadow-lg">
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <Sparkles className="w-6 h-6 text-primary" />
+              <Heart className="w-5 h-5 text-primary" fill="currentColor" />
+            </div>
+            <h3 className="text-xl font-bold mb-2">Curious about your compatibility?</h3>
+            <p className="text-muted-foreground text-sm mb-4">
+              Try our fun Love Calculator to see how strong your connection is! 💘
+            </p>
+            <Button asChild variant="outline" size="sm" className="hover-grow">
+              <a href="https://crush-scale.lovable.app/" target="_blank" rel="noopener noreferrer">
+                <Heart className="w-4 h-4 mr-2" />
+                Try Love Calculator
+              </a>
+            </Button>
           </div>
         </div>
       </section>
@@ -126,31 +168,6 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Love Calculator CTA */}
-      <section className="py-12 px-4 bg-gradient-dreamy/10">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="bg-card p-8 rounded-2xl border shadow-lg">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Sparkles className="w-8 h-8 text-primary" />
-              <Heart className="w-6 h-6 text-primary" fill="currentColor" />
-            </div>
-            <h3 className="text-2xl font-bold mb-2">Curious about your compatibility?</h3>
-            <p className="text-muted-foreground mb-4">
-              Try our fun Love Calculator to see how strong your connection is! 💘
-            </p>
-            <Button asChild variant="outline" className="hover-grow">
-              <a href="https://crush-scale.lovable.app/" target="_blank" rel="noopener noreferrer">
-                <Heart className="w-4 h-4 mr-2" />
-                Try Love Calculator
-              </a>
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      
-
       {/* Footer */}
       <footer className="py-8 px-4 border-t bg-card">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
@@ -163,5 +180,6 @@ export default function Index() {
           </p>
         </div>
       </footer>
-    </div>;
+    </div>
+  );
 }
