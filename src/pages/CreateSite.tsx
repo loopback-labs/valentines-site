@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, ArrowLeft, Sparkles, Monitor, Smartphone, Check, Loader2, CalendarDays } from "lucide-react";
+import { Heart, ArrowLeft, Sparkles, Monitor, Smartphone, Check, Loader2, CalendarDays, ImagePlus } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import TemplateSelector, { TemplateId } from "@/components/TemplateSelector";
@@ -18,6 +18,7 @@ import DatePlanningConfig, {
 } from "@/components/DatePlanningConfig";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { PasswordProtectionConfig } from "@/components/PasswordProtection";
+import { PhotoUploadConfig } from "@/components/PhotoUploadConfig";
 import { Lock } from "lucide-react";
 
 type Theme = "cute" | "minimal" | "dark" | "pastel" | "chaotic";
@@ -38,6 +39,8 @@ interface SiteConfig {
   activityOptions: string[];
   passwordProtected: boolean;
   password: string;
+  enableBackgroundPhotos: boolean;
+  backgroundPhotos: string[];
 }
 
 const themes: { id: Theme; name: string; emoji: string; description: string }[] = [
@@ -72,6 +75,8 @@ export default function CreateSite() {
     activityOptions: [...DEFAULT_ACTIVITY_OPTIONS],
     passwordProtected: false,
     password: "",
+    enableBackgroundPhotos: false,
+    backgroundPhotos: [],
   });
 
   if (loading) {
@@ -149,6 +154,9 @@ export default function CreateSite() {
       success_subtext: config.successSubtext,
       password_protected: config.passwordProtected && config.password.length > 0,
       password_hash: config.passwordProtected && config.password.length > 0 ? config.password : null,
+      background_photos: config.enableBackgroundPhotos && config.backgroundPhotos.length > 0 
+        ? config.backgroundPhotos 
+        : null,
     }).select().single();
 
     if (error) {
@@ -368,6 +376,24 @@ export default function CreateSite() {
           </CardContent>
         </Card>
 
+        {/* Personal Photos Section */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <ImagePlus className="w-5 h-5" />
+              📷 Personal Photos (Optional)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PhotoUploadConfig
+              enabled={config.enableBackgroundPhotos}
+              onEnabledChange={(enabled) => setConfig({ ...config, enableBackgroundPhotos: enabled })}
+              photos={config.backgroundPhotos}
+              onPhotosChange={(photos) => setConfig({ ...config, backgroundPhotos: photos })}
+            />
+          </CardContent>
+        </Card>
+
         {/* Bottom Section: Themes (left) + Preview (right) */}
         <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8">
           {/* Theme Selection */}
@@ -439,6 +465,7 @@ export default function CreateSite() {
                     foodOptions: config.foodOptions,
                     activityOptions: config.activityOptions,
                   }}
+                  backgroundPhotos={config.enableBackgroundPhotos ? config.backgroundPhotos : undefined}
                 />
               </div>
             </CardContent>

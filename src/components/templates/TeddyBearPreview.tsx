@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import DatePlanningForm, { DatePreferences } from "@/components/DatePlanningForm";
 import { DatePlanningConfig } from "@/components/TemplatePreview";
+import { PhotoBackground } from "@/components/PhotoUploadConfig";
 
 interface TeddyBearPreviewProps {
   config: {
@@ -13,6 +14,7 @@ interface TeddyBearPreviewProps {
     theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
   };
   datePlanningConfig?: DatePlanningConfig;
+  backgroundPhotos?: string[];
   isLive?: boolean;
   onYesClick?: () => void;
   onDateFormSubmit?: (preferences: DatePreferences) => Promise<void>;
@@ -116,6 +118,7 @@ const themeStyles = {
 export default function TeddyBearPreview({ 
   config, 
   datePlanningConfig,
+  backgroundPhotos,
   isLive = false, 
   onYesClick,
   onDateFormSubmit,
@@ -188,6 +191,10 @@ export default function TeddyBearPreview({
   if (showSuccess) {
     return (
       <div className={`h-full flex flex-col items-center justify-center p-4 ${holoClass} relative overflow-y-auto`}>
+        {/* Background Photos */}
+        {backgroundPhotos && backgroundPhotos.length > 0 && (
+          <PhotoBackground photos={backgroundPhotos} />
+        )}
         {/* Marquee text */}
         <div className="absolute top-4 left-0 right-0 overflow-hidden">
           <div className="animate-marquee whitespace-nowrap">
@@ -244,6 +251,10 @@ export default function TeddyBearPreview({
 
   return (
     <div className={`h-full flex flex-col items-center justify-center p-4 ${holoClass} relative overflow-hidden`}>
+      {/* Background Photos */}
+      {backgroundPhotos && backgroundPhotos.length > 0 && (
+        <PhotoBackground photos={backgroundPhotos} />
+      )}
       {/* Floating sad GIFs */}
       {floatingSadGifs.map((item) => (
         <div
