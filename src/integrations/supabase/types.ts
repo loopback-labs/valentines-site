@@ -115,6 +115,7 @@ export type Database = {
         Row: {
           activity_options: string[] | null
           available_dates: string[] | null
+          background_photos: string[] | null
           created_at: string
           enable_date_planning: boolean
           food_options: string[] | null
@@ -141,6 +142,7 @@ export type Database = {
         Insert: {
           activity_options?: string[] | null
           available_dates?: string[] | null
+          background_photos?: string[] | null
           created_at?: string
           enable_date_planning?: boolean
           food_options?: string[] | null
@@ -167,6 +169,7 @@ export type Database = {
         Update: {
           activity_options?: string[] | null
           available_dates?: string[] | null
+          background_photos?: string[] | null
           created_at?: string
           enable_date_planning?: boolean
           food_options?: string[] | null

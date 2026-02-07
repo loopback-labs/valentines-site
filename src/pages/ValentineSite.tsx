@@ -24,6 +24,7 @@ interface SiteData {
   time_slots: string[] | null;
   food_options: string[] | null;
   activity_options: string[] | null;
+  background_photos: string[] | null;
 }
 
 export default function ValentineSite() {
@@ -185,6 +186,7 @@ export default function ValentineSite() {
           foodOptions: site.food_options || [],
           activityOptions: site.activity_options || [],
         }}
+        backgroundPhotos={site.background_photos || undefined}
         isLive
         onYesClick={handleYesClick}
         onDateFormSubmit={handleDateFormSubmit}

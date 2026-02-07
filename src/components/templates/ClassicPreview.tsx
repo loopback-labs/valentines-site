@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Heart } from "lucide-react";
 import DatePlanningForm, { DatePreferences } from "@/components/DatePlanningForm";
 import { DatePlanningConfig } from "@/components/TemplatePreview";
+import { PhotoBackground } from "@/components/PhotoUploadConfig";
 
 interface ValentinePreviewProps {
   config: {
@@ -14,6 +15,7 @@ interface ValentinePreviewProps {
     theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
   };
   datePlanningConfig?: DatePlanningConfig;
+  backgroundPhotos?: string[];
   isLive?: boolean;
   onYesClick?: () => void;
   onDateFormSubmit?: (preferences: DatePreferences) => Promise<void>;
@@ -79,6 +81,7 @@ const themeStyles = {
 export default function ValentinePreview({ 
   config, 
   datePlanningConfig,
+  backgroundPhotos,
   isLive = false, 
   onYesClick,
   onDateFormSubmit,
@@ -146,6 +149,10 @@ export default function ValentinePreview({
   if (showSuccess) {
     return (
       <div className={`h-full flex flex-col items-center justify-center p-8 ${styles.bg} relative overflow-hidden`}>
+        {/* Background Photos */}
+        {backgroundPhotos && backgroundPhotos.length > 0 && (
+          <PhotoBackground photos={backgroundPhotos} />
+        )}
         {/* Confetti */}
         {[...Array(30)].map((_, i) => (
           <div
@@ -193,6 +200,10 @@ export default function ValentinePreview({
       ref={containerRef}
       className={`h-full flex flex-col items-center justify-center p-8 ${styles.bg} relative overflow-hidden`}
     >
+      {/* Background Photos */}
+      {backgroundPhotos && backgroundPhotos.length > 0 && (
+        <PhotoBackground photos={backgroundPhotos} />
+      )}
       {/* Floating hearts for cute/chaotic themes */}
       {(config.theme === "cute" || config.theme === "chaotic") && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
