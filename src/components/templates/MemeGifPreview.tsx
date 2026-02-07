@@ -34,7 +34,7 @@ const noButtonVariants = [
 
 // Theme-specific neutral/default GIFs
 const neutralGifsByTheme: Record<string, string> = {
-  cute: "https://media.giphy.com/media/EvYHHSntaIl5m/giphy.gif", // Adorable pleading puppy eyes
+  cute: "https://media.giphy.com/media/l0HlPwMAzh13pcZ20/giphy.gif", // Cute cat with big eyes
   minimal: "https://media.giphy.com/media/mlvseq9yvZhba/giphy.gif", // Clean simple cat
   dark: "https://media.giphy.com/media/VbnUQpnihPSIgIXuZv/giphy.gif", // Mysterious cat
   pastel: "https://media.giphy.com/media/3oKIPnAiaMCws8nOsE/giphy.gif", // Soft dreamy cat
