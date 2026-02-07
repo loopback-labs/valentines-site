@@ -6,6 +6,7 @@ import TemplatePreview from "@/components/TemplatePreview";
 import { TemplateId } from "@/components/TemplateSelector";
 import { DatePreferences } from "@/components/DatePlanningForm";
 import { PasswordEntryScreen } from "@/components/PasswordProtection";
+import { PhotoDisplayMode } from "@/components/PhotoUploadConfig";
 
 interface SiteData {
   id: string;
@@ -25,6 +26,7 @@ interface SiteData {
   food_options: string[] | null;
   activity_options: string[] | null;
   background_photos: string[] | null;
+  photo_display_mode: string | null;
 }
 
 export default function ValentineSite() {
@@ -187,6 +189,7 @@ export default function ValentineSite() {
           activityOptions: site.activity_options || [],
         }}
         backgroundPhotos={site.background_photos || undefined}
+        photoDisplayMode={(site.photo_display_mode as PhotoDisplayMode) || "background"}
         isLive
         onYesClick={handleYesClick}
         onDateFormSubmit={handleDateFormSubmit}

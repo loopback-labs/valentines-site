@@ -18,7 +18,7 @@ import DatePlanningConfig, {
 } from "@/components/DatePlanningConfig";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { PasswordProtectionConfig } from "@/components/PasswordProtection";
-import { PhotoUploadConfig } from "@/components/PhotoUploadConfig";
+import { PhotoUploadConfig, PhotoDisplayMode } from "@/components/PhotoUploadConfig";
 import { Lock } from "lucide-react";
 
 type Theme = "cute" | "minimal" | "dark" | "pastel" | "chaotic";
@@ -41,6 +41,7 @@ interface SiteConfig {
   password: string;
   enableBackgroundPhotos: boolean;
   backgroundPhotos: string[];
+  photoDisplayMode: PhotoDisplayMode;
 }
 
 const themes: { id: Theme; name: string; emoji: string; description: string }[] = [
@@ -77,6 +78,7 @@ export default function CreateSite() {
     password: "",
     enableBackgroundPhotos: false,
     backgroundPhotos: [],
+    photoDisplayMode: "background",
   });
 
   if (loading) {
@@ -157,6 +159,7 @@ export default function CreateSite() {
       background_photos: config.enableBackgroundPhotos && config.backgroundPhotos.length > 0 
         ? config.backgroundPhotos 
         : null,
+      photo_display_mode: config.photoDisplayMode,
     }).select().single();
 
     if (error) {
@@ -388,6 +391,8 @@ export default function CreateSite() {
               onEnabledChange={(enabled) => setConfig({ ...config, enableBackgroundPhotos: enabled })}
               photos={config.backgroundPhotos}
               onPhotosChange={(photos) => setConfig({ ...config, backgroundPhotos: photos })}
+              displayMode={config.photoDisplayMode}
+              onDisplayModeChange={(mode) => setConfig({ ...config, photoDisplayMode: mode })}
             />
           </CardContent>
         </Card>
@@ -464,6 +469,7 @@ export default function CreateSite() {
                     activityOptions: config.activityOptions,
                   }}
                   backgroundPhotos={config.enableBackgroundPhotos ? config.backgroundPhotos : undefined}
+                  photoDisplayMode={config.photoDisplayMode}
                 />
               </div>
             </CardContent>
