@@ -76,18 +76,34 @@ export default function ValentinePreview({ config, isLive = false, onYesClick }:
   const [yesScale, setYesScale] = useState(1);
   const [showSuccess, setShowSuccess] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const noButtonRef = useRef<HTMLButtonElement>(null);
 
   const styles = themeStyles[config.theme];
 
   const moveNoButton = () => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || !noButtonRef.current) return;
     
     const container = containerRef.current.getBoundingClientRect();
-    const maxX = container.width - 120;
-    const maxY = container.height - 60;
+    const button = noButtonRef.current.getBoundingClientRect();
     
-    const newX = Math.random() * maxX - maxX / 2;
-    const newY = Math.random() * maxY - maxY / 2;
+    // Calculate the button's original position (center of container)
+    const buttonWidth = button.width;
+    const buttonHeight = button.height;
+    
+    // Safe padding from edges
+    const padding = 20;
+    
+    // Calculate max bounds relative to button's starting position
+    // The button starts roughly in the center, so we need to calculate
+    // how far it can move in each direction
+    const maxLeft = -(container.width / 2 - buttonWidth / 2 - padding);
+    const maxRight = container.width / 2 - buttonWidth / 2 - padding;
+    const maxTop = -(container.height / 2 - buttonHeight - padding);
+    const maxBottom = container.height / 2 - buttonHeight - padding;
+    
+    // Generate random position within bounds
+    const newX = Math.random() * (maxRight - maxLeft) + maxLeft;
+    const newY = Math.random() * (maxBottom - maxTop) + maxTop;
     
     setNoPosition({ x: newX, y: newY });
     setNoIndex((prev) => Math.min(prev + 1, noButtonVariants.length - 1));
@@ -198,6 +214,7 @@ export default function ValentinePreview({ config, isLive = false, onYesClick }:
           </button>
 
           <button
+            ref={noButtonRef}
             onMouseEnter={moveNoButton}
             onClick={moveNoButton}
             className={`px-8 py-3 rounded-full font-semibold transition-all ${styles.buttonNo}`}
