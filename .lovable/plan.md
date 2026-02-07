@@ -1,255 +1,94 @@
 
 
-# Template Selection Feature for Valentine Site Creator
+## Add "Teddy Bear" Template from AlwaysBeMine
 
-## Overview
-Add a template selection step to the site creation flow, allowing users to choose from multiple Valentine site templates. The first template is the existing "Classic" design (escaping No button with floating hearts), and the second is a "Meme GIF" template inspired by the GitHub reference (animated GIF banner with growing Yes button).
+Based on the [AlwaysBeMine](https://github.com/UjjwalSaini07/AlwaysBeMine) repository, I'll add a new template with a cute teddy bear GIF, holographic gradient background, and playful interactions.
+
+### What This Template Includes
+
+The new template will feature:
+- **Holographic gradient background** - A vibrant animated gradient with pink, purple, cyan, and blue colors (matching the screenshot)
+- **Cute teddy bear GIF** - The adorable bear holding roses with floating hearts
+- **"All You Need Is Love" badge** - Decorative corner element
+- **Growing "Yes" button** - Gets bigger each time "No" is clicked
+- **Cycling "No" button text** - Shows increasingly desperate messages
+- **Floating heart/sad GIFs** - Appear when hovering over buttons
+- **Celebration state** - Romantic success screen with cycling love GIFs
+
+### Key Features Comparison
+
+| Feature | Classic | Meme GIF | Teddy Bear (New) |
+|---------|---------|----------|------------------|
+| Background | Solid gradient | Solid gradient | Holographic animated |
+| Main visual | Heart icon | Single GIF | Teddy bear + floating GIFs |
+| "No" behavior | Button escapes cursor | Button shrinks, Yes grows | Yes grows, floating sad GIFs |
+| Success state | Confetti + heart | Single happy GIF | Cycling romantic GIFs + marquee text |
 
 ---
 
-## Current State Analysis
+### Technical Implementation
 
-**Existing Template (Classic):**
-- Floating hearts animation
-- "No" button escapes cursor and moves randomly
-- "Yes" button scales up with each "No" attempt
-- 5 theme variations (cute, minimal, dark, pastel, chaotic)
-- Confetti celebration on success
+#### 1. Update Template Types
+Add `"teddy_bear"` to the `TemplateId` type in `TemplateSelector.tsx`
 
-**New Template (Meme GIF):**
-- Animated GIF banner that changes based on interaction
-- "Yes" button grows larger with each "No" click
-- "No" button text changes through variants (stays in place)
-- Simple, meme-style aesthetic
-- Success message with happy GIF
+#### 2. Create New Template Component
+Create `src/components/templates/TeddyBearPreview.tsx` with:
+- Holographic gradient background using CSS keyframe animation
+- Theme-specific color variations (adapting the holographic look for each of the 5 themes)
+- Teddy bear GIF as the main visual
+- Floating hearts/sad emoji GIFs on button hover
+- Growing Yes button mechanics
+- Success state with cycling celebration GIFs
 
----
-
-## Implementation Plan
-
-### Step 1: Database Schema Update
-
-Add a `template` column to the `valentine_sites` table:
-
+#### 3. Add Template to Selector
+Update the templates array in `TemplateSelector.tsx` to include:
 ```text
-+--------------------+
-| valentine_sites    |
-+--------------------+
-| ...existing cols   |
-| template (text)    |  <- NEW: "classic" | "meme_gif"
-+--------------------+
+id: "teddy_bear"
+name: "Teddy Bear"  
+emoji: "🧸"
+description: "Cute bear with holographic background"
+features: ["Holographic BG", "Floating GIFs", "Growing Yes"]
 ```
 
-- Default value: `"classic"` (backward compatible)
-- Type: text enum or simple text field
+#### 4. Update Template Preview Router
+Add the new template case in `TemplatePreview.tsx`
+
+#### 5. Add CSS Animation
+Add holographic gradient keyframe animation to `index.css`:
+- `bg-gradient-holographic` class for the animated multi-color gradient
+- Smooth color shifting animation (matching the screenshot aesthetic)
 
 ---
 
-### Step 2: Create Template Selection UI Component
+### Asset Sources
 
-**New File:** `src/components/TemplateSelector.tsx`
-
-A horizontal scrollable gallery of template cards:
-
-```text
-+-------------------+  +-------------------+
-|   [Preview Img]   |  |   [Preview Img]   |
-|                   |  |                   |
-|  Classic          |  |  Meme GIF         |
-|  Escaping No btn  |  |  Growing Yes btn  |
-|  [Selected]       |  |                   |
-+-------------------+  +-------------------+
-```
-
-Each card shows:
-- Animated preview thumbnail or static screenshot
-- Template name
-- Short description
-- Selection indicator (checkmark when active)
+The template will use these publicly available GIFs:
+- **Teddy bear**: From Giphy (similar cute bear with roses)
+- **Floating hearts**: Heart emojis/GIFs on Yes hover
+- **Sad faces**: Sad emoji GIFs on No hover  
+- **Success GIFs**: Cycling romantic/celebration GIFs
 
 ---
 
-### Step 3: Create Meme GIF Template Preview Component
+### Theme Adaptations
 
-**New File:** `src/components/templates/MemeGifPreview.tsx`
-
-Features:
-- Animated GIF banner area (using placeholder images initially)
-- Three GIF states: neutral, sad (on No click), happy (on Yes click)
-- Growing Yes button on each No click
-- Changing No button text (same as classic, but button stays in place)
-- Success message display
-
-**GIF States:**
-- Default: Cute hopeful character
-- On "No" clicks: Sad/pleading character
-- On "Yes": Celebrating character
+Each theme will adapt the holographic effect:
+| Theme | Holographic Colors |
+|-------|-------------------|
+| Cute | Pink, magenta, purple |
+| Minimal | White, light gray, soft blue |
+| Dark | Purple, blue, dark magenta |
+| Pastel | Lavender, soft pink, light blue |
+| Chaotic | Rainbow with faster animation |
 
 ---
 
-### Step 4: Refactor Preview Components
+### Files to Create/Modify
 
-**Update:** `src/components/ValentinePreview.tsx`
-
-Rename to `ClassicPreview.tsx` and create a wrapper:
-
-**New File:** `src/components/TemplatePreview.tsx`
-
-```text
-TemplatePreview
-   |
-   +-- template === "classic"  --> ClassicPreview
-   |
-   +-- template === "meme_gif" --> MemeGifPreview
-```
-
-This wrapper receives the template type and routes to the correct preview component.
-
----
-
-### Step 5: Update CreateSite Page Layout
-
-**Modify:** `src/pages/CreateSite.tsx`
-
-New flow with template selection as the first step:
-
-```text
-+------------------------------------------+
-| Header: Create New Site                  |
-+------------------------------------------+
-| Step 1: Choose Template                  |
-| +----------------+  +----------------+   |
-| |   Classic      |  |   Meme GIF     |   |
-| |   [Selected]   |  |                |   |
-| +----------------+  +----------------+   |
-+------------------------------------------+
-| Your URL        |  Text Customization    |
-| /your-slug      |  Headline, Subtext,    |
-|                 |  Yes/No buttons        |
-+------------------------------------------+
-| Theme Selection  |  Live Preview         |
-| (left sidebar)   |  (right panel)        |
-|                  |                       |
-+------------------------------------------+
-```
-
-**Config State Update:**
-```typescript
-interface SiteConfig {
-  template: "classic" | "meme_gif";  // NEW
-  headline: string;
-  subtext: string;
-  yesButtonText: string;
-  noButtonText: string;
-  theme: Theme;
-  slug: string;
-}
-```
-
----
-
-### Step 6: Update ValentineSite (Public Page)
-
-**Modify:** `src/pages/ValentineSite.tsx`
-
-- Fetch `template` field from database
-- Pass to `TemplatePreview` wrapper
-- Routes to correct template component
-
----
-
-### Step 7: Update Dashboard Display
-
-**Modify:** `src/pages/Dashboard.tsx`
-
-- Show template indicator on site cards (small badge/icon)
-- Template name in site details
-
----
-
-## File Changes Summary
-
-| File | Action | Description |
-|------|--------|-------------|
-| `supabase/migrations/xxx.sql` | Create | Add `template` column |
-| `src/components/TemplateSelector.tsx` | Create | Template gallery component |
-| `src/components/TemplatePreview.tsx` | Create | Template routing wrapper |
-| `src/components/templates/ClassicPreview.tsx` | Create | Renamed from ValentinePreview |
-| `src/components/templates/MemeGifPreview.tsx` | Create | New meme GIF template |
-| `src/pages/CreateSite.tsx` | Modify | Add template selection step |
-| `src/pages/ValentineSite.tsx` | Modify | Handle template routing |
-| `src/pages/Dashboard.tsx` | Modify | Show template indicator |
-| `src/index.css` | Modify | Add any new animations |
-
----
-
-## Template Data Structure
-
-```typescript
-const templates = [
-  {
-    id: "classic",
-    name: "Classic",
-    emoji: "💕",
-    description: "The 'No' button escapes your cursor",
-    features: ["Floating hearts", "Escaping button", "5 themes"],
-  },
-  {
-    id: "meme_gif",
-    name: "Meme GIF",
-    emoji: "🐱",
-    description: "Growing 'Yes' button with animated GIFs",
-    features: ["Animated banners", "Growing button", "Meme style"],
-  },
-];
-```
-
----
-
-## Visual Preview of New Template
-
-**Meme GIF Template States:**
-
-```text
-Initial State:         After No Clicks:       Success State:
-+---------------+      +---------------+      +---------------+
-|   [Happy      |      |   [Sad        |      |   [Celebrate  |
-|    GIF]       |      |    GIF]       |      |    GIF]       |
-+---------------+      +---------------+      +---------------+
-| Will you be   |      | Will you be   |      | Yay! See you  |
-| my Valentine? |      | my Valentine? |      | soon! :3      |
-+---------------+      +---------------+      +---------------+
-| [Yes]  [No]   |      |[YES!!!] [No?] |      |               |
-| (equal size)  |      |(big)   (small)|      |               |
-+---------------+      +---------------+      +---------------+
-```
-
----
-
-## Future Extensibility
-
-The architecture supports adding more templates easily:
-
-1. Create new preview component in `src/components/templates/`
-2. Add template metadata to the templates array
-3. Add case in `TemplatePreview.tsx` switch
-4. No database changes needed (just new template ID value)
-
----
-
-## Technical Considerations
-
-### GIF Assets
-- Will use placeholder/stock GIFs initially
-- Can be replaced with custom assets later
-- GIFs will be stored in `/public/images/` or fetched from CDN
-
-### Theme Compatibility
-- Classic template: Full 5-theme support (existing)
-- Meme GIF template: Simplified theme support (light/dark variants)
-- Each template can define which themes it supports
-
-### Mobile Responsiveness
-- Both templates fully responsive
-- Meme GIF template optimized for mobile (GIF banner scales)
+| File | Action |
+|------|--------|
+| `src/components/templates/TeddyBearPreview.tsx` | Create new template component |
+| `src/components/TemplateSelector.tsx` | Add teddy_bear to TemplateId type and templates array |
+| `src/components/TemplatePreview.tsx` | Add teddy_bear case to switch statement |
+| `src/index.css` | Add holographic gradient animation |
 
