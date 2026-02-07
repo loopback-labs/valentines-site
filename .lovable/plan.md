@@ -1,156 +1,255 @@
 
 
-# 💘 Valentine Website Generator + Hosting Platform
+# Template Selection Feature for Valentine Site Creator
 
-A full-featured web app that lets users create, customize, and host their own playful "Will You Be My Valentine?" websites with the classic "No is not an option" interaction.
-
----
-
-## 🎯 Core Experience
-
-### User Journey
-1. **Sign Up/Login** → Create account to save and manage sites
-2. **Customize** → Pick text, theme, and style with live preview
-3. **Publish** → Get a unique shareable URL like `/piyushh`
-4. **Share** → Copy link or download QR code
-5. **Track** → See when someone clicks "Yes!"
+## Overview
+Add a template selection step to the site creation flow, allowing users to choose from multiple Valentine site templates. The first template is the existing "Classic" design (escaping No button with floating hearts), and the second is a "Meme GIF" template inspired by the GitHub reference (animated GIF banner with growing Yes button).
 
 ---
 
-## 🎨 Website Maker Dashboard
+## Current State Analysis
 
-### Design Style
-- **Playful & Bold Gen-Z aesthetic**
-- Vibrant gradients, bold typography, colorful accents
-- Fun micro-interactions and animations
-- Mobile-first, responsive layout
+**Existing Template (Classic):**
+- Floating hearts animation
+- "No" button escapes cursor and moves randomly
+- "Yes" button scales up with each "No" attempt
+- 5 theme variations (cute, minimal, dark, pastel, chaotic)
+- Confetti celebration on success
 
-### Configuration Panel
-
-**Text Customization**
-- Main headline (e.g., "Will You Be My Valentine?")
-- Description/subtext
-- "Yes" button text
-- "No" button text with optional funny variants that change on hover
-
-**Mood/Style Presets (5 themes)**
-| Theme | Vibe |
-|-------|------|
-| 💕 Cute | Soft pinks, hearts, romantic |
-| ⬜ Minimal | Clean, modern, understated |
-| 🌙 Dark | Moody, elegant, mysterious |
-| 🍬 Pastel | Soft colors, dreamy aesthetic |
-| 🎪 Chaotic | Extra animations, playful chaos |
-
-**Live Preview**
-- Side-by-side preview that updates in real-time
-- Toggle between desktop/mobile view
-- Preview the "No" button escape animation
+**New Template (Meme GIF):**
+- Animated GIF banner that changes based on interaction
+- "Yes" button grows larger with each "No" click
+- "No" button text changes through variants (stays in place)
+- Simple, meme-style aesthetic
+- Success message with happy GIF
 
 ---
 
-## 🖥️ Generated Valentine Sites
+## Implementation Plan
 
-### Core Interaction Flow (preserved from original)
-1. Site loads with main question
-2. "Yes" button works normally
-3. "No" button runs away when hovered/clicked
-4. "No" gets progressively harder to click
-5. Success celebration when "Yes" is clicked
+### Step 1: Database Schema Update
 
-### Features
-- Responsive on all devices
-- Smooth animations
-- Fast loading (static generation)
-- Clean, shareable URLs
+Add a `template` column to the `valentine_sites` table:
 
----
-
-## 🔗 Hosting & Publishing
-
-### URL Structure
-- Users claim unique slugs: `yourapp.lovable.app/piyushh`
-- Slug validation (no duplicates, appropriate length)
-- Option to change slug later
-
-### Sharing Tools
-- One-click copy URL button
-- Auto-generated QR code for download
-- Optional password protection toggle
-
----
-
-## 📊 Response Tracking
-
-### Dashboard View
-- View count: how many people visited your link
-- "Yes" click count with celebration indicator
-- Timestamp of responses
-- Simple, clean stats display
-
----
-
-## 👤 User Accounts
-
-### Authentication
-- Email/password signup
-- Optional social login (Google)
-- Email verification
-
-### User Dashboard
-- List of all created Valentine sites
-- Edit existing sites
-- View analytics per site
-- Delete sites
-
----
-
-## 🛠️ Technical Architecture
-
-### Frontend
-- React with Tailwind CSS for styling
-- Framer-motion-style animations
-- Real-time preview with state management
-
-### Backend (Lovable Cloud)
-- **Database**: Store user accounts, site configs, response tracking
-- **Authentication**: Supabase Auth with required accounts
-- **Dynamic Routing**: Load site config based on username slug
-
-### Data Flow
-```
-User Config (JSON) → Template Engine → Rendered Valentine Site
+```text
++--------------------+
+| valentine_sites    |
++--------------------+
+| ...existing cols   |
+| template (text)    |  <- NEW: "classic" | "meme_gif"
++--------------------+
 ```
 
+- Default value: `"classic"` (backward compatible)
+- Type: text enum or simple text field
+
 ---
 
-## 📋 Development Phases
+### Step 2: Create Template Selection UI Component
 
-### Phase 1: Foundation
-- User authentication (signup, login, logout)
-- User dashboard shell
-- Database schema for sites and configs
+**New File:** `src/components/TemplateSelector.tsx`
 
-### Phase 2: Site Builder
-- Configuration UI with all text inputs
-- All 5 theme presets
-- Live preview component
-- Slug selection and validation
+A horizontal scrollable gallery of template cards:
 
-### Phase 3: Valentine Template
-- Build the interactive Valentine site template
-- "No" button escape behavior
-- All animations and theme variations
-- Mobile responsiveness
+```text
++-------------------+  +-------------------+
+|   [Preview Img]   |  |   [Preview Img]   |
+|                   |  |                   |
+|  Classic          |  |  Meme GIF         |
+|  Escaping No btn  |  |  Growing Yes btn  |
+|  [Selected]       |  |                   |
++-------------------+  +-------------------+
+```
 
-### Phase 4: Publishing & Sharing
-- Dynamic routing for user slugs
-- Copy URL functionality
-- QR code generation
-- Password protection toggle
+Each card shows:
+- Animated preview thumbnail or static screenshot
+- Template name
+- Short description
+- Selection indicator (checkmark when active)
 
-### Phase 5: Analytics & Polish
-- Response tracking (views and "Yes" clicks)
-- Analytics dashboard
-- Final UI polish and testing
+---
+
+### Step 3: Create Meme GIF Template Preview Component
+
+**New File:** `src/components/templates/MemeGifPreview.tsx`
+
+Features:
+- Animated GIF banner area (using placeholder images initially)
+- Three GIF states: neutral, sad (on No click), happy (on Yes click)
+- Growing Yes button on each No click
+- Changing No button text (same as classic, but button stays in place)
+- Success message display
+
+**GIF States:**
+- Default: Cute hopeful character
+- On "No" clicks: Sad/pleading character
+- On "Yes": Celebrating character
+
+---
+
+### Step 4: Refactor Preview Components
+
+**Update:** `src/components/ValentinePreview.tsx`
+
+Rename to `ClassicPreview.tsx` and create a wrapper:
+
+**New File:** `src/components/TemplatePreview.tsx`
+
+```text
+TemplatePreview
+   |
+   +-- template === "classic"  --> ClassicPreview
+   |
+   +-- template === "meme_gif" --> MemeGifPreview
+```
+
+This wrapper receives the template type and routes to the correct preview component.
+
+---
+
+### Step 5: Update CreateSite Page Layout
+
+**Modify:** `src/pages/CreateSite.tsx`
+
+New flow with template selection as the first step:
+
+```text
++------------------------------------------+
+| Header: Create New Site                  |
++------------------------------------------+
+| Step 1: Choose Template                  |
+| +----------------+  +----------------+   |
+| |   Classic      |  |   Meme GIF     |   |
+| |   [Selected]   |  |                |   |
+| +----------------+  +----------------+   |
++------------------------------------------+
+| Your URL        |  Text Customization    |
+| /your-slug      |  Headline, Subtext,    |
+|                 |  Yes/No buttons        |
++------------------------------------------+
+| Theme Selection  |  Live Preview         |
+| (left sidebar)   |  (right panel)        |
+|                  |                       |
++------------------------------------------+
+```
+
+**Config State Update:**
+```typescript
+interface SiteConfig {
+  template: "classic" | "meme_gif";  // NEW
+  headline: string;
+  subtext: string;
+  yesButtonText: string;
+  noButtonText: string;
+  theme: Theme;
+  slug: string;
+}
+```
+
+---
+
+### Step 6: Update ValentineSite (Public Page)
+
+**Modify:** `src/pages/ValentineSite.tsx`
+
+- Fetch `template` field from database
+- Pass to `TemplatePreview` wrapper
+- Routes to correct template component
+
+---
+
+### Step 7: Update Dashboard Display
+
+**Modify:** `src/pages/Dashboard.tsx`
+
+- Show template indicator on site cards (small badge/icon)
+- Template name in site details
+
+---
+
+## File Changes Summary
+
+| File | Action | Description |
+|------|--------|-------------|
+| `supabase/migrations/xxx.sql` | Create | Add `template` column |
+| `src/components/TemplateSelector.tsx` | Create | Template gallery component |
+| `src/components/TemplatePreview.tsx` | Create | Template routing wrapper |
+| `src/components/templates/ClassicPreview.tsx` | Create | Renamed from ValentinePreview |
+| `src/components/templates/MemeGifPreview.tsx` | Create | New meme GIF template |
+| `src/pages/CreateSite.tsx` | Modify | Add template selection step |
+| `src/pages/ValentineSite.tsx` | Modify | Handle template routing |
+| `src/pages/Dashboard.tsx` | Modify | Show template indicator |
+| `src/index.css` | Modify | Add any new animations |
+
+---
+
+## Template Data Structure
+
+```typescript
+const templates = [
+  {
+    id: "classic",
+    name: "Classic",
+    emoji: "💕",
+    description: "The 'No' button escapes your cursor",
+    features: ["Floating hearts", "Escaping button", "5 themes"],
+  },
+  {
+    id: "meme_gif",
+    name: "Meme GIF",
+    emoji: "🐱",
+    description: "Growing 'Yes' button with animated GIFs",
+    features: ["Animated banners", "Growing button", "Meme style"],
+  },
+];
+```
+
+---
+
+## Visual Preview of New Template
+
+**Meme GIF Template States:**
+
+```text
+Initial State:         After No Clicks:       Success State:
++---------------+      +---------------+      +---------------+
+|   [Happy      |      |   [Sad        |      |   [Celebrate  |
+|    GIF]       |      |    GIF]       |      |    GIF]       |
++---------------+      +---------------+      +---------------+
+| Will you be   |      | Will you be   |      | Yay! See you  |
+| my Valentine? |      | my Valentine? |      | soon! :3      |
++---------------+      +---------------+      +---------------+
+| [Yes]  [No]   |      |[YES!!!] [No?] |      |               |
+| (equal size)  |      |(big)   (small)|      |               |
++---------------+      +---------------+      +---------------+
+```
+
+---
+
+## Future Extensibility
+
+The architecture supports adding more templates easily:
+
+1. Create new preview component in `src/components/templates/`
+2. Add template metadata to the templates array
+3. Add case in `TemplatePreview.tsx` switch
+4. No database changes needed (just new template ID value)
+
+---
+
+## Technical Considerations
+
+### GIF Assets
+- Will use placeholder/stock GIFs initially
+- Can be replaced with custom assets later
+- GIFs will be stored in `/public/images/` or fetched from CDN
+
+### Theme Compatibility
+- Classic template: Full 5-theme support (existing)
+- Meme GIF template: Simplified theme support (light/dark variants)
+- Each template can define which themes it supports
+
+### Mobile Responsiveness
+- Both templates fully responsive
+- Meme GIF template optimized for mobile (GIF banner scales)
 
