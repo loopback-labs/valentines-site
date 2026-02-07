@@ -56,7 +56,7 @@ const happyGifsByTheme: Record<string, string> = {
 const themeStyles = {
   cute: {
     bg: "bg-gradient-to-br from-pink-50 via-white to-rose-50",
-    card: "bg-white/80 backdrop-blur border border-pink-200",
+    card: "",
     text: "text-pink-900",
     subtext: "text-pink-700",
     buttonYes: "bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white shadow-lg shadow-pink-500/25",
@@ -64,7 +64,7 @@ const themeStyles = {
   },
   minimal: {
     bg: "bg-white",
-    card: "bg-gray-50 border border-gray-200",
+    card: "",
     text: "text-gray-900",
     subtext: "text-gray-600",
     buttonYes: "bg-gray-900 hover:bg-gray-800 text-white",
@@ -72,7 +72,7 @@ const themeStyles = {
   },
   dark: {
     bg: "bg-gradient-to-br from-gray-900 via-purple-950 to-gray-900",
-    card: "bg-gray-800/50 backdrop-blur border border-purple-500/30",
+    card: "",
     text: "text-white",
     subtext: "text-purple-200",
     buttonYes: "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg shadow-purple-500/25",
@@ -80,7 +80,7 @@ const themeStyles = {
   },
   pastel: {
     bg: "bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100",
-    card: "bg-white/70 backdrop-blur border border-purple-200",
+    card: "",
     text: "text-purple-900",
     subtext: "text-purple-700",
     buttonYes: "bg-gradient-to-r from-purple-400 to-pink-400 hover:from-purple-500 hover:to-pink-500 text-white shadow-lg shadow-purple-400/25",
@@ -88,7 +88,7 @@ const themeStyles = {
   },
   chaotic: {
     bg: "bg-gradient-chaotic",
-    card: "bg-white/20 backdrop-blur-lg border border-white/30",
+    card: "",
     text: "text-white",
     subtext: "text-white/80",
     buttonYes: "bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 hover:from-yellow-500 hover:via-pink-600 hover:to-purple-600 text-white animate-pulse shadow-lg",
