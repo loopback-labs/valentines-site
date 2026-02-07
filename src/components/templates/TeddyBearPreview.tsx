@@ -178,7 +178,6 @@ export default function TeddyBearPreview({
   }, [config.theme]);
 
   const showDatePlanningForm = datePlanningConfig?.enableDatePlanning && 
-    datePlanningConfig.availableDates.length > 0 &&
     datePlanningConfig.timeSlots.length > 0;
   
   const handleDateFormSubmit = onDateFormSubmit || (async () => {
@@ -216,7 +215,6 @@ export default function TeddyBearPreview({
 
           {showDatePlanningForm && (
             <DatePlanningForm
-              availableDates={datePlanningConfig.availableDates}
               timeSlots={datePlanningConfig.timeSlots}
               foodOptions={datePlanningConfig.foodOptions}
               activityOptions={datePlanningConfig.activityOptions}

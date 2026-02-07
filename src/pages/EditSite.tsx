@@ -32,7 +32,6 @@ interface SiteConfig {
   slug: string;
   isPublished: boolean;
   enableDatePlanning: boolean;
-  availableDates: Date[];
   timeSlots: string[];
   foodOptions: string[];
   activityOptions: string[];
@@ -68,7 +67,6 @@ export default function EditSite() {
     slug: "",
     isPublished: false,
     enableDatePlanning: false,
-    availableDates: [],
     timeSlots: [...DEFAULT_TIME_SLOTS],
     foodOptions: [...DEFAULT_FOOD_OPTIONS],
     activityOptions: [...DEFAULT_ACTIVITY_OPTIONS],
@@ -112,9 +110,6 @@ export default function EditSite() {
       slug: data.slug,
       isPublished: data.is_published,
       enableDatePlanning: data.enable_date_planning || false,
-      availableDates: data.available_dates 
-        ? data.available_dates.map((d: string) => new Date(d)) 
-        : [],
       timeSlots: data.time_slots || [...DEFAULT_TIME_SLOTS],
       foodOptions: data.food_options || [...DEFAULT_FOOD_OPTIONS],
       activityOptions: data.activity_options || [...DEFAULT_ACTIVITY_OPTIONS],
@@ -155,9 +150,6 @@ export default function EditSite() {
         theme: config.theme,
         is_published: publish,
         enable_date_planning: config.enableDatePlanning,
-        available_dates: config.availableDates.length > 0 
-          ? config.availableDates.map(d => d.toISOString().split('T')[0]) 
-          : null,
         time_slots: config.timeSlots,
         food_options: config.foodOptions,
         activity_options: config.activityOptions,
@@ -349,8 +341,6 @@ export default function EditSite() {
                 <DatePlanningConfig
                   enabled={config.enableDatePlanning}
                   onEnabledChange={(enabled) => setConfig({ ...config, enableDatePlanning: enabled })}
-                  availableDates={config.availableDates}
-                  onAvailableDatesChange={(dates) => setConfig({ ...config, availableDates: dates })}
                   timeSlots={config.timeSlots}
                   onTimeSlotsChange={(slots) => setConfig({ ...config, timeSlots: slots })}
                   foodOptions={config.foodOptions}
@@ -430,7 +420,6 @@ export default function EditSite() {
                   config={config}
                   datePlanningConfig={{
                     enableDatePlanning: config.enableDatePlanning,
-                    availableDates: config.availableDates,
                     timeSlots: config.timeSlots,
                     foodOptions: config.foodOptions,
                     activityOptions: config.activityOptions,
