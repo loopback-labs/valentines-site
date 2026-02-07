@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -5,7 +6,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CalendarIcon, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { CalendarIcon, X, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -59,6 +61,10 @@ export default function DatePlanningConfig({
   activityOptions,
   onActivityOptionsChange,
 }: DatePlanningConfigProps) {
+  const [newTimeSlot, setNewTimeSlot] = useState("");
+  const [newFoodOption, setNewFoodOption] = useState("");
+  const [newActivityOption, setNewActivityOption] = useState("");
+
   const handleDateSelect = (date: Date | undefined) => {
     if (!date) return;
     
@@ -92,6 +98,32 @@ export default function DatePlanningConfig({
       onChange([...array, item]);
     }
   };
+
+  const addCustomOption = (
+    value: string,
+    currentOptions: string[],
+    onChange: (options: string[]) => void,
+    clearInput: () => void
+  ) => {
+    const trimmed = value.trim();
+    if (trimmed && !currentOptions.includes(trimmed)) {
+      onChange([...currentOptions, trimmed]);
+      clearInput();
+    }
+  };
+
+  const removeCustomOption = (
+    option: string,
+    currentOptions: string[],
+    onChange: (options: string[]) => void
+  ) => {
+    onChange(currentOptions.filter(o => o !== option));
+  };
+
+  // Get all options (defaults + custom ones already in the list)
+  const allTimeSlots = [...new Set([...DEFAULT_TIME_SLOTS, ...timeSlots])];
+  const allFoodOptions = [...new Set([...DEFAULT_FOOD_OPTIONS, ...foodOptions])];
+  const allActivityOptions = [...new Set([...DEFAULT_ACTIVITY_OPTIONS, ...activityOptions])];
 
   return (
     <div className="space-y-6">
@@ -175,7 +207,7 @@ export default function DatePlanningConfig({
               Select which time slots are available
             </p>
             <div className="grid grid-cols-2 gap-2">
-              {DEFAULT_TIME_SLOTS.map((slot) => (
+              {allTimeSlots.map((slot) => (
                 <label
                   key={slot}
                   className="flex items-center space-x-2 cursor-pointer"
@@ -185,8 +217,42 @@ export default function DatePlanningConfig({
                     onCheckedChange={() => toggleArrayItem(timeSlots, slot, onTimeSlotsChange)}
                   />
                   <span className="text-sm">{slot}</span>
+                  {!DEFAULT_TIME_SLOTS.includes(slot) && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        removeCustomOption(slot, timeSlots, onTimeSlotsChange);
+                      }}
+                      className="ml-auto text-muted-foreground hover:text-destructive"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  )}
                 </label>
               ))}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Add custom time slot..."
+                value={newTimeSlot}
+                onChange={(e) => setNewTimeSlot(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addCustomOption(newTimeSlot, timeSlots, onTimeSlotsChange, () => setNewTimeSlot(""));
+                  }
+                }}
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => addCustomOption(newTimeSlot, timeSlots, onTimeSlotsChange, () => setNewTimeSlot(""))}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
             </div>
           </div>
 
@@ -197,7 +263,7 @@ export default function DatePlanningConfig({
               Select which food options to offer
             </p>
             <div className="grid grid-cols-2 gap-2">
-              {DEFAULT_FOOD_OPTIONS.map((option) => (
+              {allFoodOptions.map((option) => (
                 <label
                   key={option}
                   className="flex items-center space-x-2 cursor-pointer"
@@ -207,8 +273,42 @@ export default function DatePlanningConfig({
                     onCheckedChange={() => toggleArrayItem(foodOptions, option, onFoodOptionsChange)}
                   />
                   <span className="text-sm">{option}</span>
+                  {!DEFAULT_FOOD_OPTIONS.includes(option) && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        removeCustomOption(option, foodOptions, onFoodOptionsChange);
+                      }}
+                      className="ml-auto text-muted-foreground hover:text-destructive"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  )}
                 </label>
               ))}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Add custom food option..."
+                value={newFoodOption}
+                onChange={(e) => setNewFoodOption(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addCustomOption(newFoodOption, foodOptions, onFoodOptionsChange, () => setNewFoodOption(""));
+                  }
+                }}
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => addCustomOption(newFoodOption, foodOptions, onFoodOptionsChange, () => setNewFoodOption(""))}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
             </div>
           </div>
 
@@ -219,7 +319,7 @@ export default function DatePlanningConfig({
               Select which activities to offer
             </p>
             <div className="grid grid-cols-2 gap-2">
-              {DEFAULT_ACTIVITY_OPTIONS.map((option) => (
+              {allActivityOptions.map((option) => (
                 <label
                   key={option}
                   className="flex items-center space-x-2 cursor-pointer"
@@ -229,8 +329,42 @@ export default function DatePlanningConfig({
                     onCheckedChange={() => toggleArrayItem(activityOptions, option, onActivityOptionsChange)}
                   />
                   <span className="text-sm">{option}</span>
+                  {!DEFAULT_ACTIVITY_OPTIONS.includes(option) && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        removeCustomOption(option, activityOptions, onActivityOptionsChange);
+                      }}
+                      className="ml-auto text-muted-foreground hover:text-destructive"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  )}
                 </label>
               ))}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Add custom activity..."
+                value={newActivityOption}
+                onChange={(e) => setNewActivityOption(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addCustomOption(newActivityOption, activityOptions, onActivityOptionsChange, () => setNewActivityOption(""));
+                  }
+                }}
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => addCustomOption(newActivityOption, activityOptions, onActivityOptionsChange, () => setNewActivityOption(""))}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>
