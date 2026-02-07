@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Heart, Sparkles, Zap, Share2, BarChart3 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import Footer from "@/components/Footer";
 
 export default function Index() {
   const { user, loading } = useAuth();
@@ -183,18 +184,7 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-8 px-4 border-t bg-card">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Heart className="w-6 h-6 text-primary" fill="currentColor" />
-            <span className="font-semibold">Valentine Maker</span>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Made with 💕 for spreading love
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
