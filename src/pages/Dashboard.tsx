@@ -259,6 +259,9 @@ export default function Dashboard() {
                     <Button asChild variant="outline" size="sm" className="flex-1">
                       <Link to={`/edit/${site.id}`}>Edit</Link>
                     </Button>
+                    <Button asChild variant="outline" size="sm">
+                      <Link to={`/responses/${site.id}`}>Responses</Link>
+                    </Button>
                     {site.is_published && (
                       <Button asChild variant="outline" size="sm">
                         <a href={`/${site.slug}`} target="_blank" rel="noopener noreferrer">
