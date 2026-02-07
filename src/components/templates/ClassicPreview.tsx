@@ -136,7 +136,13 @@ export default function ValentinePreview({
   }, [config.theme]);
 
   const showDatePlanningForm = datePlanningConfig?.enableDatePlanning && 
-    datePlanningConfig.availableDates.length > 0;
+    datePlanningConfig.availableDates.length > 0 &&
+    datePlanningConfig.timeSlots.length > 0;
+  
+  const handleDateFormSubmit = onDateFormSubmit || (async () => {
+    // Preview mode - just log
+    console.log("Date form submitted (preview mode)");
+  });
 
   if (showSuccess) {
     return (
@@ -169,13 +175,13 @@ export default function ValentinePreview({
             {config.successSubtext || "I knew you'd say yes! 💕"}
           </p>
 
-          {showDatePlanningForm && onDateFormSubmit && (
+          {showDatePlanningForm && (
             <DatePlanningForm
               availableDates={datePlanningConfig.availableDates}
               timeSlots={datePlanningConfig.timeSlots}
               foodOptions={datePlanningConfig.foodOptions}
               activityOptions={datePlanningConfig.activityOptions}
-              onSubmit={onDateFormSubmit}
+              onSubmit={handleDateFormSubmit}
               theme={config.theme}
             />
           )}
