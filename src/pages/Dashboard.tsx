@@ -4,7 +4,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, Plus, Eye, MousePointerClick, LogOut, Sparkles, ExternalLink, Trash2, Copy } from "lucide-react";
+import { Heart, Plus, Eye, MousePointerClick, LogOut, Sparkles, ExternalLink, Trash2, Copy, ChevronDown, Calculator, Image as ImageIcon } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 interface ValentineSite {
   id: string;
@@ -104,15 +110,37 @@ export default function Dashboard() {
           </Link>
 
           <div className="flex items-center gap-4">
-            <a 
-              href="https://crush-scale.lovable.app/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-sm text-muted-foreground hover:text-primary transition-colors hidden sm:flex items-center gap-1"
-            >
-              <Heart className="w-4 h-4" />
-              Love Calculator
-            </a>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="text-sm text-muted-foreground hover:text-primary transition-colors hidden sm:flex items-center gap-1 outline-none">
+                <Sparkles className="w-4 h-4" />
+                More Tools
+                <ChevronDown className="w-3 h-3" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <a 
+                    href="https://crush-scale.lovable.app/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <Calculator className="w-4 h-4" />
+                    Love Calculator
+                  </a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a 
+                    href="https://memorywall.merchandice.in" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <ImageIcon className="w-4 h-4" />
+                    Memory Wall
+                  </a>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <span className="text-sm text-muted-foreground hidden sm:block">
               {user.email}
             </span>
