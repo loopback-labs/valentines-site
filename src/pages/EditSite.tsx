@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heart, ArrowLeft, Sparkles, Monitor, Smartphone, Check, Loader2, CalendarDays, ImagePlus } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import TemplateSelector, { TemplateId } from "@/components/TemplateSelector";
@@ -393,11 +394,16 @@ export default function EditSite() {
 
         {/* Personal Photos Section */}
         <Card className="mb-8">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg flex items-center gap-2">
               <ImagePlus className="w-5 h-5" />
-              📷 Personal Photos (Optional)
+              📷 Memories (Optional)
             </CardTitle>
+            <Switch 
+              id="photo-bg-toggle" 
+              checked={config.enableBackgroundPhotos} 
+              onCheckedChange={(enabled) => setConfig({ ...config, enableBackgroundPhotos: enabled })} 
+            />
           </CardHeader>
           <CardContent>
             <PhotoUploadConfig
