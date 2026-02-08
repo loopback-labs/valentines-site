@@ -85,9 +85,7 @@ export default function Index() {
           <div className="relative max-w-md mx-auto">
             <div className="bg-gradient-to-br from-pink-100 via-pink-50 to-rose-100 rounded-2xl p-8 shadow-2xl border transform hover:scale-105 transition-transform">
               <Heart className="w-12 h-12 text-pink-500 mx-auto mb-4" fill="currentColor" />
-              <h3 className="text-xl font-bold text-pink-800 mb-2">
-                Will You Be My Valentine?
-              </h3>
+              <h3 className="text-xl font-bold text-pink-800 mb-2">Will You Be My Valentine?</h3>
               <p className="text-pink-600 mb-4">I really like you... 💕</p>
               <div className="flex gap-3 justify-center">
                 <span className="px-6 py-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full text-sm font-semibold">
@@ -111,11 +109,9 @@ export default function Index() {
               <Heart className="w-5 h-5 text-primary" fill="currentColor" />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold mb-2">More Love Tools 💕</h2>
-            <p className="text-muted-foreground">
-              Explore our collection of fun relationship tools!
-            </p>
+            <p className="text-muted-foreground">Explore our collection of fun relationship tools!</p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Love Calculator */}
             <div className="bg-card/80 backdrop-blur-sm p-6 rounded-2xl border shadow-lg hover:shadow-xl transition-shadow hover-grow">
@@ -127,7 +123,7 @@ export default function Index() {
                 Curious about your compatibility? See how strong your connection is! 💘
               </p>
               <Button asChild variant="outline" size="sm" className="w-full hover-grow">
-                <a href="https://crush-scale.lovable.app/" target="_blank" rel="noopener noreferrer">
+                <a href="https://lovemeter.merchandice.in/" target="_blank" rel="noopener noreferrer">
                   <Heart className="w-4 h-4 mr-2" />
                   Try Now
                 </a>
@@ -157,9 +153,7 @@ export default function Index() {
       {/* Features Section */}
       <section className="py-20 px-4 bg-muted/30">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Why Choose Love Link?
-          </h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Why Choose Love Link?</h2>
           <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
             The easiest way to create a fun, shareable Valentine's message
           </p>
@@ -205,9 +199,7 @@ export default function Index() {
             <Heart className="w-6 h-6 text-primary" fill="currentColor" />
             <span className="font-semibold">Love Link</span>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Made with 💕 for spreading love
-          </p>
+          <p className="text-sm text-muted-foreground">Made with 💕 for spreading love</p>
         </div>
       </footer>
     </div>
