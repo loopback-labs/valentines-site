@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, Plus, Eye, MousePointerClick, LogOut, Sparkles, ExternalLink, Trash2 } from "lucide-react";
+import { Heart, Plus, Eye, MousePointerClick, LogOut, Sparkles, ExternalLink, Trash2, Copy } from "lucide-react";
 import { toast } from "sonner";
 interface ValentineSite {
   id: string;
@@ -257,11 +257,26 @@ export default function Dashboard() {
                     <Button asChild variant="outline" size="sm">
                       <Link to={`/responses/${site.id}`}>Responses</Link>
                     </Button>
-                    {site.is_published && <Button asChild variant="outline" size="sm">
-                        <a href={`/${site.slug}`} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="w-4 h-4" />
-                        </a>
-                      </Button>}
+                    {site.is_published && (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const url = `${window.location.origin}/${site.slug}`;
+                            navigator.clipboard.writeText(url);
+                            toast.success("Link copied! 📋");
+                          }}
+                        >
+                          <Copy className="w-4 h-4" />
+                        </Button>
+                        <Button asChild variant="outline" size="sm">
+                          <a href={`/${site.slug}`} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="w-4 h-4" />
+                          </a>
+                        </Button>
+                      </>
+                    )}
                     <Button variant="outline" size="sm" onClick={() => deleteSite(site.id)} className="text-destructive hover:text-destructive">
                       <Trash2 className="w-4 h-4" />
                     </Button>
