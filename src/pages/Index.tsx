@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Heart, Sparkles, Zap, Share2, BarChart3 } from "lucide-react";
+import { Heart, Sparkles, Zap, Share2, BarChart3, Image as ImageIcon } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Index() {
@@ -102,24 +102,54 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Love Calculator CTA */}
-      <section className="py-8 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="bg-card/80 backdrop-blur-sm p-6 rounded-2xl border shadow-lg">
+      {/* Tools Section */}
+      <section className="py-12 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-2 mb-3">
               <Sparkles className="w-6 h-6 text-primary" />
               <Heart className="w-5 h-5 text-primary" fill="currentColor" />
             </div>
-            <h3 className="text-xl font-bold mb-2">Curious about your compatibility?</h3>
-            <p className="text-muted-foreground text-sm mb-4">
-              Try our fun Love Calculator to see how strong your connection is! 💘
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">More Love Tools 💕</h2>
+            <p className="text-muted-foreground">
+              Explore our collection of fun relationship tools!
             </p>
-            <Button asChild variant="outline" size="sm" className="hover-grow">
-              <a href="https://crush-scale.lovable.app/" target="_blank" rel="noopener noreferrer">
-                <Heart className="w-4 h-4 mr-2" />
-                Try Love Calculator
-              </a>
-            </Button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Love Calculator */}
+            <div className="bg-card/80 backdrop-blur-sm p-6 rounded-2xl border shadow-lg hover:shadow-xl transition-shadow hover-grow">
+              <div className="w-12 h-12 bg-gradient-love rounded-xl flex items-center justify-center mb-4 mx-auto">
+                <Heart className="w-6 h-6 text-white" fill="currentColor" />
+              </div>
+              <h3 className="text-xl font-bold mb-2 text-center">Love Calculator</h3>
+              <p className="text-muted-foreground text-sm mb-4 text-center">
+                Curious about your compatibility? See how strong your connection is! 💘
+              </p>
+              <Button asChild variant="outline" size="sm" className="w-full hover-grow">
+                <a href="https://crush-scale.lovable.app/" target="_blank" rel="noopener noreferrer">
+                  <Heart className="w-4 h-4 mr-2" />
+                  Try Now
+                </a>
+              </Button>
+            </div>
+
+            {/* Memory Wall */}
+            <div className="bg-card/80 backdrop-blur-sm p-6 rounded-2xl border shadow-lg hover:shadow-xl transition-shadow hover-grow">
+              <div className="w-12 h-12 bg-gradient-sunset rounded-xl flex items-center justify-center mb-4 mx-auto">
+                <ImageIcon className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-xl font-bold mb-2 text-center">Memory Wall</h3>
+              <p className="text-muted-foreground text-sm mb-4 text-center">
+                Create a beautiful wall of memories with your special moments! 📸
+              </p>
+              <Button asChild variant="outline" size="sm" className="w-full hover-grow">
+                <a href="https://memorywall.merchandice.in" target="_blank" rel="noopener noreferrer">
+                  <ImageIcon className="w-4 h-4 mr-2" />
+                  Try Now
+                </a>
+              </Button>
+            </div>
           </div>
         </div>
       </section>
