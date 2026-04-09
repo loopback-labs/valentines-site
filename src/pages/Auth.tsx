@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Heart, Sparkles, Mail, Lock, User } from "lucide-react";
 import { toast } from "sonner";
 export default function Auth() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const {
     user,
     loading,
@@ -26,6 +28,14 @@ export default function Auth() {
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [signupName, setSignupName] = useState("");
+
+  useEffect(() => {
+    if (loading || user || location.pathname !== "/auth/callback") return;
+
+    toast.error("Google sign-in failed. Please try again.");
+    navigate("/auth", { replace: true });
+  }, [loading, user, location.pathname, navigate]);
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center bg-gradient-love">
         <div className="animate-pulse">
