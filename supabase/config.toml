@@ -2,3 +2,6 @@ project_id = "vxhxiqyblekkpcjpwage"
 
 [functions.verify-site-password]
 verify_jwt = false
+
+[functions.cleanup-stale-photos]
+verify_jwt = true

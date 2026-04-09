@@ -167,6 +167,10 @@ export default function CreateSite() {
       toast.error("Failed to create site");
       console.error(error);
     } else {
+      if (publish) {
+        await supabase.functions.invoke("cleanup-stale-photos");
+      }
+
       toast.success(publish ? "Site published! 🎉" : "Site saved as draft");
       navigate("/dashboard");
     }

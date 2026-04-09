@@ -187,6 +187,10 @@ export default function EditSite() {
       toast.error("Failed to update site");
       console.error(error);
     } else {
+      if (publish) {
+        await supabase.functions.invoke("cleanup-stale-photos");
+      }
+
       toast.success(publish ? "Site published! 🎉" : "Changes saved");
       navigate("/dashboard");
     }
