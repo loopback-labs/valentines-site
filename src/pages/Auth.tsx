@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +13,8 @@ export default function Auth() {
     user,
     loading,
     signIn,
-    signUp
+    signUp,
+    signInWithOAuth
   } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -66,9 +66,7 @@ export default function Auth() {
     setIsLoading(true);
     const {
       error
-    } = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin
-    });
+    } = await signInWithOAuth("google");
     if (error) {
       toast.error(error.message || "Failed to sign in with Google");
       setIsLoading(false);

@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://valentines-site.lovable.app/sitemap.xml
+Sitemap: https://lovelink.merchandice.in/sitemap.xml

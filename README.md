@@ -1,24 +1,17 @@
-# Welcome to your Lovable project
+# Love Link
 
-## Project info
+## Project Info
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+This repository is configured to run independently with your own Supabase project.
 
-## How can I edit this code?
+## Live Site
 
-There are several ways of editing your application.
+- Production URL: `https://lovelink.merchandice.in`
+- Hosting: GitHub Pages (GitHub Actions deploy)
 
-**Use Lovable**
+## Run Locally
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Prerequisite: Node.js + npm ([install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating))
 
 Follow these steps:
 
@@ -36,38 +29,57 @@ npm i
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Deploy to GitHub Pages
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+This repository deploys automatically via `.github/workflows/deploy-pages.yml`.
 
-**Use GitHub Codespaces**
+### 1) Configure GitHub Pages
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- Open **Settings > Pages**
+- Set **Source** to **GitHub Actions**
 
-## What technologies are used for this project?
+### 2) Add build variables
 
-This project is built with:
+In **Settings > Secrets and variables > Actions**:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- Add **Variables**:
+  - `VITE_SUPABASE_URL`
+  - `VITE_SUPABASE_PROJECT_ID` (optional)
+  - `VITE_BASE_PATH` = `/`
+- Add **Secret**:
+  - `VITE_SUPABASE_PUBLISHABLE_KEY`
 
-## How can I deploy this project?
+`/` is required because this project uses a custom domain root.
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+### 3) Push to `main`
 
-## Can I connect a custom domain to my Lovable project?
+Each push to `main` triggers deployment and publishes `dist`.
 
-Yes, you can!
+### 4) Configure Supabase auth redirects
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+In Supabase Auth URL settings, add these redirect URLs:
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- `https://lovelink.merchandice.in/auth`
+
+Set **Site URL** to:
+
+- `https://lovelink.merchandice.in`
+
+## Custom domain on GitHub Pages
+
+Already configured for `lovelink.merchandice.in`.
+
+If you change domains later:
+
+1. Update `public/CNAME`
+2. Update domain URLs in `index.html`, `public/sitemap.xml`, and `public/robots.txt`
+3. Update Supabase Auth redirect URL + Site URL
+4. Update DNS records in your domain provider and re-enable HTTPS in GitHub Pages
+
+## Local Env File
+
+Use `.env` (not committed) with:
+
+- `VITE_SUPABASE_PROJECT_ID`
+- `VITE_SUPABASE_PUBLISHABLE_KEY`
+- `VITE_SUPABASE_URL`

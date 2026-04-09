@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+.cursor
+valentine-photos-export
+migration-artifacts
+supabase/.temp
+.env
+.env.old
+scripts
