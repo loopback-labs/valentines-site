@@ -2,8 +2,9 @@ import { useState, useRef, useEffect } from "react";
 import { Heart } from "lucide-react";
 import DatePlanningForm, { DatePreferences } from "@/components/DatePlanningForm";
 import { DatePlanningConfig } from "@/components/TemplatePreview";
-import { PhotoBackground, PhotoGallery } from "@/components/PhotoUploadConfig";
-import { PhotoDisplayMode } from "@/components/PhotoUploadConfig";
+import { PhotoBackground, PhotoGallery, type PhotoDisplayMode } from "@/components/PhotoUploadConfig";
+import { NO_BUTTON_VARIANTS } from "@/components/templates/shared";
+import type { Theme } from "@/types/site";
 
 interface ValentinePreviewProps {
   config: {
@@ -13,34 +14,14 @@ interface ValentinePreviewProps {
     noButtonText: string;
     successHeadline?: string;
     successSubtext?: string;
-    theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
+    theme: Theme;
   };
   datePlanningConfig?: DatePlanningConfig;
   backgroundPhotos?: string[];
   photoDisplayMode?: PhotoDisplayMode;
-  isLive?: boolean;
   onYesClick?: () => void;
   onDateFormSubmit?: (preferences: DatePreferences) => Promise<void>;
 }
-
-const noButtonVariants = [
-  "No",
-  "Are you sure?",
-  "Really sure?",
-  "Think again!",
-  "Last chance!",
-  "Surely not?",
-  "You might regret this!",
-  "Give it another thought!",
-  "Are you absolutely sure?",
-  "This could be a mistake!",
-  "Have a heart!",
-  "Don't be so cold!",
-  "Change of heart?",
-  "Wouldn't you reconsider?",
-  "Is that your final answer?",
-  "You're breaking my heart ;(",
-];
 
 const themeStyles = {
   cute: {
@@ -85,7 +66,6 @@ export default function ValentinePreview({
   datePlanningConfig,
   backgroundPhotos,
   photoDisplayMode = "background",
-  isLive = false, 
   onYesClick,
   onDateFormSubmit,
 }: ValentinePreviewProps) {
@@ -124,7 +104,7 @@ export default function ValentinePreview({
     const newY = Math.random() * (maxBottom - maxTop) + maxTop;
     
     setNoPosition({ x: newX, y: newY });
-    setNoIndex((prev) => Math.min(prev + 1, noButtonVariants.length - 1));
+    setNoIndex((prev) => Math.min(prev + 1, NO_BUTTON_VARIANTS.length - 1));
     setYesScale((prev) => Math.min(prev + 0.1, 1.8));
   };
 
@@ -279,7 +259,7 @@ export default function ValentinePreview({
               transition: "transform 0.2s ease-out",
             }}
           >
-            {noButtonVariants[noIndex] || config.noButtonText || "No"}
+            {NO_BUTTON_VARIANTS[noIndex] || config.noButtonText || "No"}
           </button>
         </div>
       </div>

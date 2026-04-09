@@ -7,6 +7,7 @@ import { TemplateId } from "@/components/TemplateSelector";
 import { DatePreferences } from "@/components/DatePlanningForm";
 import { PasswordEntryScreen } from "@/components/PasswordProtection";
 import { PhotoDisplayMode } from "@/components/PhotoUploadConfig";
+import type { Theme } from "@/types/site";
 
 // SiteData now excludes password_hash - it's never sent to the client
 interface SiteData {
@@ -18,10 +19,9 @@ interface SiteData {
   no_button_text: string;
   success_headline: string | null;
   success_subtext: string | null;
-  theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
+  theme: Theme;
   password_protected: boolean;
   enable_date_planning: boolean;
-  available_dates: string[] | null;
   time_slots: string[] | null;
   food_options: string[] | null;
   activity_options: string[] | null;
@@ -117,7 +117,7 @@ export default function ValentineSite() {
 
     // Increment view count using RPC
     try {
-      await (supabase.rpc as Function)("increment_view_count", { site_id: siteId });
+      await supabase.rpc("increment_view_count", { site_id: siteId });
     } catch {
       // RPC might not exist yet, silently fail
     }
@@ -133,7 +133,7 @@ export default function ValentineSite() {
 
     // Increment yes count using RPC
     try {
-      await (supabase.rpc as Function)("increment_yes_count", { site_id: site.id });
+      await supabase.rpc("increment_yes_count", { site_id: site.id });
     } catch {
       // RPC might not exist yet, silently fail
     }
@@ -206,7 +206,6 @@ export default function ValentineSite() {
         }}
         backgroundPhotos={site.background_photos || undefined}
         photoDisplayMode={(site.photo_display_mode as PhotoDisplayMode) || "background"}
-        isLive
         onYesClick={handleYesClick}
         onDateFormSubmit={handleDateFormSubmit}
       />

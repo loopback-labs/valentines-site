@@ -4,6 +4,7 @@ import MemeGifPreview from "./templates/MemeGifPreview";
 import TeddyBearPreview from "./templates/TeddyBearPreview";
 import { DatePreferences } from "./DatePlanningForm";
 import { PhotoDisplayMode } from "./PhotoUploadConfig";
+import type { Theme } from "@/types/site";
 
 export interface DatePlanningConfig {
   enableDatePlanning: boolean;
@@ -21,12 +22,11 @@ interface TemplatePreviewProps {
     noButtonText: string;
     successHeadline?: string;
     successSubtext?: string;
-    theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
+    theme: Theme;
   };
   datePlanningConfig?: DatePlanningConfig;
   backgroundPhotos?: string[];
   photoDisplayMode?: PhotoDisplayMode;
-  isLive?: boolean;
   onYesClick?: () => void;
   onDateFormSubmit?: (preferences: DatePreferences) => Promise<void>;
 }
@@ -37,7 +37,6 @@ export default function TemplatePreview({
   datePlanningConfig,
   backgroundPhotos,
   photoDisplayMode = "background",
-  isLive = false, 
   onYesClick,
   onDateFormSubmit,
 }: TemplatePreviewProps) {
@@ -49,7 +48,6 @@ export default function TemplatePreview({
           datePlanningConfig={datePlanningConfig}
           backgroundPhotos={backgroundPhotos}
           photoDisplayMode={photoDisplayMode}
-          isLive={isLive} 
           onYesClick={onYesClick}
           onDateFormSubmit={onDateFormSubmit}
         />
@@ -61,7 +59,6 @@ export default function TemplatePreview({
           datePlanningConfig={datePlanningConfig}
           backgroundPhotos={backgroundPhotos}
           photoDisplayMode={photoDisplayMode}
-          isLive={isLive} 
           onYesClick={onYesClick}
           onDateFormSubmit={onDateFormSubmit}
         />
@@ -74,7 +71,6 @@ export default function TemplatePreview({
           datePlanningConfig={datePlanningConfig}
           backgroundPhotos={backgroundPhotos}
           photoDisplayMode={photoDisplayMode}
-          isLive={isLive} 
           onYesClick={onYesClick}
           onDateFormSubmit={onDateFormSubmit}
         />

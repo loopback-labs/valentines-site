@@ -16,12 +16,7 @@ export const DEFAULT_TIME_SLOTS = [
   "Post 10 PM",
 ];
 
-export const DEFAULT_FOOD_OPTIONS = [
-  "Indian",
-  "Asian",
-  "North Indian",
-  "South Indian",
-];
+export const DEFAULT_FOOD_OPTIONS = ["Indian", "Asian", "North Indian", "South Indian"];
 
 export const DEFAULT_ACTIVITY_OPTIONS = [
   "Movie night",
@@ -42,6 +37,93 @@ interface DatePlanningConfigProps {
   onActivityOptionsChange: (options: string[]) => void;
 }
 
+function OptionEditor({
+  sectionLabel,
+  sectionHint,
+  defaultPresets,
+  options,
+  onOptionsChange,
+  addPlaceholder,
+}: {
+  sectionLabel: string;
+  sectionHint: string;
+  defaultPresets: readonly string[];
+  options: string[];
+  onOptionsChange: (items: string[]) => void;
+  addPlaceholder: string;
+}) {
+  const [newValue, setNewValue] = useState("");
+
+  const allChoices = [...new Set([...defaultPresets, ...options])];
+
+  const toggleArrayItem = (item: string) => {
+    if (options.includes(item)) {
+      onOptionsChange(options.filter((i) => i !== item));
+    } else {
+      onOptionsChange([...options, item]);
+    }
+  };
+
+  const addCustomOption = () => {
+    const trimmed = newValue.trim();
+    if (trimmed && !options.includes(trimmed)) {
+      onOptionsChange([...options, trimmed]);
+      setNewValue("");
+    }
+  };
+
+  const removeCustomOption = (option: string) => {
+    onOptionsChange(options.filter((o) => o !== option));
+  };
+
+  return (
+    <div className="space-y-3">
+      <Label className="text-sm font-medium">{sectionLabel}</Label>
+      <p className="text-xs text-muted-foreground">{sectionHint}</p>
+      <div className="grid grid-cols-2 gap-2">
+        {allChoices.map((choice) => (
+          <label key={choice} className="flex items-center space-x-2 cursor-pointer">
+            <Checkbox
+              checked={options.includes(choice)}
+              onCheckedChange={() => toggleArrayItem(choice)}
+            />
+            <span className="text-sm">{choice}</span>
+            {!defaultPresets.includes(choice) && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  removeCustomOption(choice);
+                }}
+                className="ml-auto text-muted-foreground hover:text-destructive"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            )}
+          </label>
+        ))}
+      </div>
+      <div className="flex gap-2">
+        <Input
+          placeholder={addPlaceholder}
+          value={newValue}
+          onChange={(e) => setNewValue(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              addCustomOption();
+            }
+          }}
+          className="flex-1"
+        />
+        <Button type="button" variant="outline" size="icon" onClick={addCustomOption}>
+          <Plus className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function DatePlanningConfig({
   enabled,
   onEnabledChange,
@@ -52,52 +134,8 @@ export default function DatePlanningConfig({
   activityOptions,
   onActivityOptionsChange,
 }: DatePlanningConfigProps) {
-  const [newTimeSlot, setNewTimeSlot] = useState("");
-  const [newFoodOption, setNewFoodOption] = useState("");
-  const [newActivityOption, setNewActivityOption] = useState("");
-
-
-  const toggleArrayItem = (
-    array: string[],
-    item: string,
-    onChange: (items: string[]) => void
-  ) => {
-    if (array.includes(item)) {
-      onChange(array.filter(i => i !== item));
-    } else {
-      onChange([...array, item]);
-    }
-  };
-
-  const addCustomOption = (
-    value: string,
-    currentOptions: string[],
-    onChange: (options: string[]) => void,
-    clearInput: () => void
-  ) => {
-    const trimmed = value.trim();
-    if (trimmed && !currentOptions.includes(trimmed)) {
-      onChange([...currentOptions, trimmed]);
-      clearInput();
-    }
-  };
-
-  const removeCustomOption = (
-    option: string,
-    currentOptions: string[],
-    onChange: (options: string[]) => void
-  ) => {
-    onChange(currentOptions.filter(o => o !== option));
-  };
-
-  // Get all options (defaults + custom ones already in the list)
-  const allTimeSlots = [...new Set([...DEFAULT_TIME_SLOTS, ...timeSlots])];
-  const allFoodOptions = [...new Set([...DEFAULT_FOOD_OPTIONS, ...foodOptions])];
-  const allActivityOptions = [...new Set([...DEFAULT_ACTIVITY_OPTIONS, ...activityOptions])];
-
   return (
     <div className="space-y-6">
-      {/* Enable Toggle */}
       <div className="flex items-center justify-between">
         <div>
           <Label htmlFor="date-planning-toggle" className="text-base font-medium">
@@ -107,16 +145,11 @@ export default function DatePlanningConfig({
             Show a form after "Yes" to collect date preferences
           </p>
         </div>
-        <Switch
-          id="date-planning-toggle"
-          checked={enabled}
-          onCheckedChange={onEnabledChange}
-        />
+        <Switch id="date-planning-toggle" checked={enabled} onCheckedChange={onEnabledChange} />
       </div>
 
       {enabled && (
         <div className="space-y-6 pt-4 border-t border-border">
-          {/* Date Selection Info */}
           <div className="rounded-lg bg-muted/50 p-4 border border-border">
             <div className="flex items-start gap-3">
               <div className="mt-0.5 text-primary">📅</div>
@@ -129,173 +162,32 @@ export default function DatePlanningConfig({
             </div>
           </div>
 
-          {/* Time Slots */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Time Slots</Label>
-            <p className="text-xs text-muted-foreground">
-              Select which time slots are available
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              {allTimeSlots.map((slot) => (
-                <label
-                  key={slot}
-                  className="flex items-center space-x-2 cursor-pointer"
-                >
-                  <Checkbox
-                    checked={timeSlots.includes(slot)}
-                    onCheckedChange={() => toggleArrayItem(timeSlots, slot, onTimeSlotsChange)}
-                  />
-                  <span className="text-sm">{slot}</span>
-                  {!DEFAULT_TIME_SLOTS.includes(slot) && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        removeCustomOption(slot, timeSlots, onTimeSlotsChange);
-                      }}
-                      className="ml-auto text-muted-foreground hover:text-destructive"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  )}
-                </label>
-              ))}
-            </div>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Add custom time slot..."
-                value={newTimeSlot}
-                onChange={(e) => setNewTimeSlot(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    addCustomOption(newTimeSlot, timeSlots, onTimeSlotsChange, () => setNewTimeSlot(""));
-                  }
-                }}
-                className="flex-1"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => addCustomOption(newTimeSlot, timeSlots, onTimeSlotsChange, () => setNewTimeSlot(""))}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+          <OptionEditor
+            sectionLabel="Time Slots"
+            sectionHint="Select which time slots are available"
+            defaultPresets={DEFAULT_TIME_SLOTS}
+            options={timeSlots}
+            onOptionsChange={onTimeSlotsChange}
+            addPlaceholder="Add custom time slot..."
+          />
 
-          {/* Food Options */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Food Options</Label>
-            <p className="text-xs text-muted-foreground">
-              Select which food options to offer
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              {allFoodOptions.map((option) => (
-                <label
-                  key={option}
-                  className="flex items-center space-x-2 cursor-pointer"
-                >
-                  <Checkbox
-                    checked={foodOptions.includes(option)}
-                    onCheckedChange={() => toggleArrayItem(foodOptions, option, onFoodOptionsChange)}
-                  />
-                  <span className="text-sm">{option}</span>
-                  {!DEFAULT_FOOD_OPTIONS.includes(option) && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        removeCustomOption(option, foodOptions, onFoodOptionsChange);
-                      }}
-                      className="ml-auto text-muted-foreground hover:text-destructive"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  )}
-                </label>
-              ))}
-            </div>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Add custom food option..."
-                value={newFoodOption}
-                onChange={(e) => setNewFoodOption(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    addCustomOption(newFoodOption, foodOptions, onFoodOptionsChange, () => setNewFoodOption(""));
-                  }
-                }}
-                className="flex-1"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => addCustomOption(newFoodOption, foodOptions, onFoodOptionsChange, () => setNewFoodOption(""))}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+          <OptionEditor
+            sectionLabel="Food Options"
+            sectionHint="Select which food options to offer"
+            defaultPresets={DEFAULT_FOOD_OPTIONS}
+            options={foodOptions}
+            onOptionsChange={onFoodOptionsChange}
+            addPlaceholder="Add custom food option..."
+          />
 
-          {/* Activity Options */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Activity Options</Label>
-            <p className="text-xs text-muted-foreground">
-              Select which activities to offer
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              {allActivityOptions.map((option) => (
-                <label
-                  key={option}
-                  className="flex items-center space-x-2 cursor-pointer"
-                >
-                  <Checkbox
-                    checked={activityOptions.includes(option)}
-                    onCheckedChange={() => toggleArrayItem(activityOptions, option, onActivityOptionsChange)}
-                  />
-                  <span className="text-sm">{option}</span>
-                  {!DEFAULT_ACTIVITY_OPTIONS.includes(option) && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        removeCustomOption(option, activityOptions, onActivityOptionsChange);
-                      }}
-                      className="ml-auto text-muted-foreground hover:text-destructive"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  )}
-                </label>
-              ))}
-            </div>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Add custom activity..."
-                value={newActivityOption}
-                onChange={(e) => setNewActivityOption(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    addCustomOption(newActivityOption, activityOptions, onActivityOptionsChange, () => setNewActivityOption(""));
-                  }
-                }}
-                className="flex-1"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => addCustomOption(newActivityOption, activityOptions, onActivityOptionsChange, () => setNewActivityOption(""))}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+          <OptionEditor
+            sectionLabel="Activity Options"
+            sectionHint="Select which activities to offer"
+            defaultPresets={DEFAULT_ACTIVITY_OPTIONS}
+            options={activityOptions}
+            onOptionsChange={onActivityOptionsChange}
+            addPlaceholder="Add custom activity..."
+          />
         </div>
       )}
     </div>

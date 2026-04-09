@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { CalendarIcon, Loader2, Heart, Check, ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import type { Theme } from "@/types/site";
 
 export interface DatePreferences {
   selectedDate: Date;
@@ -19,7 +20,7 @@ interface DatePlanningFormProps {
   foodOptions: string[];
   activityOptions: string[];
   onSubmit: (preferences: DatePreferences) => Promise<void>;
-  theme?: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
+  theme?: Theme;
 }
 
 const themeStyles = {

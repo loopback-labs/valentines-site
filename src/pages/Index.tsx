@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Heart, Sparkles, Zap, Share2, BarChart3, Image as ImageIcon } from "lucide-react";
@@ -5,6 +6,18 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export default function Index() {
   const { user, loading } = useAuth();
+
+  const floatingHearts = useMemo(
+    () =>
+      Array.from({ length: 20 }, () => ({
+        left: Math.random() * 100,
+        top: Math.random() * 100,
+        size: 20 + Math.random() * 40,
+        delay: Math.random() * 3,
+        duration: 3 + Math.random() * 2,
+      })),
+    [],
+  );
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
@@ -15,17 +28,17 @@ export default function Index() {
 
         {/* Floating hearts */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(20)].map((_, i) => (
+          {floatingHearts.map((h, i) => (
             <Heart
               key={i}
               className="absolute text-primary opacity-10 animate-float"
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                width: `${20 + Math.random() * 40}px`,
-                height: `${20 + Math.random() * 40}px`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${3 + Math.random() * 2}s`,
+                left: `${h.left}%`,
+                top: `${h.top}%`,
+                width: `${h.size}px`,
+                height: `${h.size}px`,
+                animationDelay: `${h.delay}s`,
+                animationDuration: `${h.duration}s`,
               }}
               fill="currentColor"
             />

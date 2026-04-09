@@ -25,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { THEME_EMOJIS, type Theme } from "@/types/site";
 interface ValentineSite {
   id: string;
   slug: string;
@@ -71,7 +72,7 @@ export default function Dashboard() {
       toast.error("Failed to delete site");
     } else {
       toast.success("Site deleted");
-      setSites(sites.filter((s) => s.id !== siteId));
+      setSites((prev) => prev.filter((s) => s.id !== siteId));
     }
   };
   if (loading) {
@@ -86,13 +87,6 @@ export default function Dashboard() {
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
-  const themeEmojis: Record<string, string> = {
-    cute: "💕",
-    minimal: "⬜",
-    dark: "🌙",
-    pastel: "🍬",
-    chaotic: "🎪",
-  };
   const templateLabels: Record<
     string,
     {
@@ -270,7 +264,7 @@ export default function Dashboard() {
                   <div className="flex items-start justify-between">
                     <div>
                       <CardTitle className="text-lg flex items-center gap-2">
-                        <span>{themeEmojis[site.theme] || "💕"}</span>
+                        <span>{THEME_EMOJIS[site.theme as Theme] || "💕"}</span>
                         {site.headline.slice(0, 30)}
                         {site.headline.length > 30 && "..."}
                       </CardTitle>

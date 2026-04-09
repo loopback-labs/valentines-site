@@ -2,8 +2,13 @@ import { useState, useEffect } from "react";
 import { Heart } from "lucide-react";
 import DatePlanningForm, { DatePreferences } from "@/components/DatePlanningForm";
 import { DatePlanningConfig } from "@/components/TemplatePreview";
-import { PhotoBackground, PhotoGallery } from "@/components/PhotoUploadConfig";
-import { PhotoDisplayMode } from "@/components/PhotoUploadConfig";
+import {
+  PhotoBackground,
+  PhotoGallery,
+  type PhotoDisplayMode,
+} from "@/components/PhotoUploadConfig";
+import { NEUTRAL_GIFS_BY_THEME, NO_BUTTON_VARIANTS } from "@/components/templates/shared";
+import type { Theme } from "@/types/site";
 
 interface MemeGifPreviewProps {
   config: {
@@ -13,43 +18,14 @@ interface MemeGifPreviewProps {
     noButtonText: string;
     successHeadline?: string;
     successSubtext?: string;
-    theme: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
+    theme: Theme;
   };
   datePlanningConfig?: DatePlanningConfig;
   backgroundPhotos?: string[];
   photoDisplayMode?: PhotoDisplayMode;
-  isLive?: boolean;
   onYesClick?: () => void;
   onDateFormSubmit?: (preferences: DatePreferences) => Promise<void>;
 }
-
-const noButtonVariants = [
-  "No",
-  "Are you sure?",
-  "Really sure?",
-  "Think again!",
-  "Last chance!",
-  "Surely not?",
-  "You might regret this!",
-  "Give it another thought!",
-  "Are you absolutely sure?",
-  "This could be a mistake!",
-  "Have a heart!",
-  "Don't be so cold!",
-  "Change of heart?",
-  "Wouldn't you reconsider?",
-  "Is that your final answer?",
-  "You're breaking my heart ;(",
-];
-
-// Theme-specific neutral/default GIFs
-const neutralGifsByTheme: Record<string, string> = {
-  cute: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZm1jN2tiem55bXBrbTlja3Q1MHNwc2wzM3podzd1OXYzejFvNXd0byZlcD12MV9naWZzX3NlYXJjaCZjdD1n/8QbwUh40Hl96yMgvOx/giphy.gif", // Cute pleading cat
-  minimal: "https://media.giphy.com/media/mlvseq9yvZhba/giphy.gif", // Clean simple cat
-  dark: "https://media.giphy.com/media/VbnUQpnihPSIgIXuZv/giphy.gif", // Mysterious cat
-  pastel: "https://media.giphy.com/media/3oKIPnAiaMCws8nOsE/giphy.gif", // Soft dreamy cat
-  chaotic: "https://media.giphy.com/media/nR4L10XlJcSeQ/giphy.gif", // Crazy energetic cat
-};
 
 // Sad GIF (same for all themes)
 const sadGif = "https://media.giphy.com/media/BEob5qwFkSJ7G/giphy.gif";
@@ -111,7 +87,6 @@ export default function MemeGifPreview({
   datePlanningConfig,
   backgroundPhotos,
   photoDisplayMode = "background",
-  isLive = false, 
   onYesClick,
   onDateFormSubmit,
 }: MemeGifPreviewProps) {
@@ -123,7 +98,7 @@ export default function MemeGifPreview({
   const styles = themeStyles[config.theme];
 
   const handleNoClick = () => {
-    setNoIndex((prev) => Math.min(prev + 1, noButtonVariants.length - 1));
+    setNoIndex((prev) => Math.min(prev + 1, NO_BUTTON_VARIANTS.length - 1));
     setYesScale((prev) => Math.min(prev + 0.15, 2.5));
     setGifState("sad");
   };
@@ -234,7 +209,11 @@ export default function MemeGifPreview({
         {/* GIF Banner */}
         <div className="w-full aspect-square max-w-[200px] mx-auto mb-6 rounded-xl overflow-hidden">
           <img
-            src={gifState === "neutral" ? (neutralGifsByTheme[config.theme] || neutralGifsByTheme.cute) : sadGif}
+            src={
+              gifState === "neutral"
+                ? NEUTRAL_GIFS_BY_THEME[config.theme] || NEUTRAL_GIFS_BY_THEME.cute
+                : sadGif
+            }
             alt="Valentine"
             className="w-full h-full object-cover"
           />
@@ -278,7 +257,7 @@ export default function MemeGifPreview({
               opacity: Math.max(0.5, 1 - noIndex * 0.03),
             }}
           >
-            {noButtonVariants[noIndex] || config.noButtonText || "No"}
+            {NO_BUTTON_VARIANTS[noIndex] || config.noButtonText || "No"}
           </button>
         </div>
       </div>

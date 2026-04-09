@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Lock, Eye, EyeOff, ShieldCheck } from "lucide-react";
+import type { Theme } from "@/types/site";
 
 interface PasswordProtectionConfigProps {
   enabled: boolean;
@@ -92,7 +93,7 @@ interface PasswordEntryScreenProps {
   onSubmit: (password: string) => void;
   error?: string;
   isLoading?: boolean;
-  theme?: "cute" | "minimal" | "dark" | "pastel" | "chaotic";
+  theme?: Theme;
 }
 
 export function PasswordEntryScreen({

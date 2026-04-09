@@ -47,18 +47,18 @@ export default function Responses() {
   const [responses, setResponses] = useState<SiteResponse[]>([]);
   const [loadingData, setLoadingData] = useState(true);
 
-  useEffect(() => {
-    if (user && id) {
-      fetchData();
-    }
-  }, [user, id]);
-
   const fetchData = async () => {
-    // Fetch site info
+    const uid = user?.id;
+    if (!uid || !id) {
+      setLoadingData(false);
+      return;
+    }
+
     const { data: siteData, error: siteError } = await supabase
       .from("valentine_sites")
       .select("id, headline, slug, view_count, yes_count")
       .eq("id", id)
+      .eq("user_id", uid)
       .maybeSingle();
 
     if (siteError || !siteData) {
@@ -69,35 +69,40 @@ export default function Responses() {
 
     setSite(siteData);
 
-    // Fetch date preferences
-    const { data: prefsData, error: prefsError } = await supabase
-      .from("date_preferences")
-      .select("*")
-      .eq("site_id", id)
-      .order("created_at", { ascending: false });
+    const [prefsResult, respResult] = await Promise.all([
+      supabase
+        .from("date_preferences")
+        .select("*")
+        .eq("site_id", id)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("site_responses")
+        .select("*")
+        .eq("site_id", id)
+        .order("created_at", { ascending: false })
+        .limit(50),
+    ]);
 
-    if (prefsError) {
-      console.error("Error fetching preferences:", prefsError);
+    if (prefsResult.error) {
+      console.error("Error fetching preferences:", prefsResult.error);
     } else {
-      setDatePreferences(prefsData || []);
+      setDatePreferences(prefsResult.data || []);
     }
 
-    // Fetch recent responses
-    const { data: respData, error: respError } = await supabase
-      .from("site_responses")
-      .select("*")
-      .eq("site_id", id)
-      .order("created_at", { ascending: false })
-      .limit(50);
-
-    if (respError) {
-      console.error("Error fetching responses:", respError);
+    if (respResult.error) {
+      console.error("Error fetching responses:", respResult.error);
     } else {
-      setResponses(respData || []);
+      setResponses(respResult.data || []);
     }
 
     setLoadingData(false);
   };
+
+  useEffect(() => {
+    if (user && id) {
+      fetchData();
+    }
+  }, [user, id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) {
     return (
