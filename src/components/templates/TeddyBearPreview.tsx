@@ -109,7 +109,7 @@ export default function TeddyBearPreview({
   const [currentHappyGif, setCurrentHappyGif] = useState(0);
   const [floatingSadGifs, setFloatingSadGifs] = useState<Array<{ id: number; gif: string; x: number; y: number }>>([]);
   const [risingHearts] = useState(() => randomRisingHearts(15));
-  const [floatingHearts] = useState(() => randomFloatingHearts(8));
+  const [floatingHearts, setFloatingHearts] = useState(() => randomFloatingHearts(8));
 
   const styles = themeStyles[config.theme];
   const holoClass = holoThemes[config.theme];
@@ -126,6 +126,7 @@ export default function TeddyBearPreview({
       y: Math.random() * 40 + 30,
     };
     setFloatingSadGifs((prev) => [...prev.slice(-4), newSadGif]);
+    setFloatingHearts(randomFloatingHearts(8));
   };
 
   const handleYesClick = () => {

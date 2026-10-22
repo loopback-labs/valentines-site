@@ -1,6 +1,6 @@
 // Random layouts for purely decorative elements. Call these from a lazy
-// useState initializer so positions are picked once per mount instead of
-// on every render.
+// useState initializer, or from an event handler to reshuffle on purpose
+// (the templates move their hearts on each "No"), never during render.
 
 export function randomFloatingHearts(count: number, minSize = 20, sizeRange = 40) {
   return Array.from({ length: count }, () => ({

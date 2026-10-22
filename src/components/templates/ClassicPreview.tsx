@@ -77,7 +77,7 @@ export default function ValentinePreview({
   const containerRef = useRef<HTMLDivElement>(null);
   const noButtonRef = useRef<HTMLButtonElement>(null);
   const [confetti] = useState(() => randomConfetti(30));
-  const [floatingHearts] = useState(() => randomFloatingHearts(8, 15, 25));
+  const [floatingHearts, setFloatingHearts] = useState(() => randomFloatingHearts(8, 15, 25));
 
   const styles = themeStyles[config.theme];
 
@@ -109,6 +109,7 @@ export default function ValentinePreview({
     setNoPosition({ x: newX, y: newY });
     setNoIndex((prev) => Math.min(prev + 1, NO_BUTTON_VARIANTS.length - 1));
     setYesScale((prev) => Math.min(prev + 0.1, 1.8));
+    setFloatingHearts(randomFloatingHearts(8, 15, 25));
   };
 
   const handleYesClick = () => {
