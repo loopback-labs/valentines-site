@@ -73,10 +73,11 @@ export default function Responses() {
   const loadingData = responsesQuery.isPending;
 
   useEffect(() => {
-    if (responsesQuery.isError || responsesQuery.data?.site === null) {
+    const failedWithoutData = responsesQuery.isError && !responsesQuery.data;
+    if (failedWithoutData || responsesQuery.data?.site === null) {
       toast.error("Site not found");
     }
-  }, [responsesQuery.isError, responsesQuery.data?.site]);
+  }, [responsesQuery.isError, responsesQuery.data]);
 
   if (loading) {
     return (

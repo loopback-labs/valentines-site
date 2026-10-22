@@ -70,7 +70,7 @@ export default function ValentineSite() {
   });
   const site = siteQuery.data ?? null;
   const loading = siteQuery.isPending;
-  const notFound = siteQuery.isError || (siteQuery.isSuccess && !site);
+  const notFound = !site && (siteQuery.isError || siteQuery.isSuccess);
   const isUnlocked = !!site && (!site.password_protected || passwordUnlocked);
 
   // Track view immediately for non-protected sites

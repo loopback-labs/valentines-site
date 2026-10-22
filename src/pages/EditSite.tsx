@@ -75,8 +75,10 @@ export default function EditSite() {
     return <LoadingScreen />;
   }
 
+  // A failed background refetch keeps the previous data, so only redirect when
+  // there is no row; otherwise in-progress edits would be lost.
   const site = siteQuery.data;
-  if (siteQuery.isError || !site || site.user_id !== user.id) {
+  if (!site || site.user_id !== user.id) {
     return <Navigate to="/dashboard" replace />;
   }
 
