@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-"Love Link" — a Valentine's site builder. Logged-in users create a shareable `/:slug` page that asks someone a yes/no question (with an evasive "No" button), optionally collects date-planning preferences, and reports responses back to the creator. Vite + React 18 + TypeScript + Tailwind + shadcn/ui on the frontend; Supabase (Postgres, Auth, Storage, Edge Functions) as the only backend. Originally scaffolded with Lovable.
+"Love Link" — a Valentine's site builder. Logged-in users create a shareable `/:slug` page that asks someone a yes/no question (with an evasive "No" button), optionally collects date-planning preferences, and reports responses back to the creator. Vite + React 19 + react-router 7 + TanStack Query + TypeScript + Tailwind 3 + shadcn/ui on the frontend; Supabase (Postgres, Auth, Storage, Edge Functions) as the only backend. Originally scaffolded with Lovable.
 
 ## Commands
 
@@ -14,13 +14,14 @@ Requires Node 24 (`.nvmrc`; run `nvm use`). CI builds on Node 24 too.
 npm i                 # install (npm is canonical; CI uses `npm ci`. bun.lockb also exists)
 npm run dev           # dev server on http://localhost:8080
 npm run build         # production build to dist/ (also copies index.html -> 404.html)
-npm run lint          # eslint
+npm run lint          # eslint (includes React Compiler rules from eslint-plugin-react-hooks 7)
 npm test              # vitest run (jsdom, setup in src/test/setup.ts)
 npx vitest run src/path/to/file.test.ts   # single test file
 npx vitest run -t "test name"             # single test by name
+npx tsc --noEmit -p tsconfig.app.json     # type-check (the build does not type-check)
 ```
 
-Tests live under `src/**/*.{test,spec}.{ts,tsx}`; only a placeholder test exists today.
+Tests live next to source as `src/**/*.{test,spec}.{ts,tsx}` (e.g. `src/components/ui/calendar.test.tsx`). `supabase/functions/` (Deno) is excluded from eslint.
 
 ## Environment
 
@@ -49,7 +50,11 @@ Google Analytics is injected at build time by a Vite plugin only when `VITE_GA_M
 
 **Editor ↔ renderer split**: `CreateSite` and `EditSite` both wrap `SiteEditorForm` (form + live preview) and differ only in load/insert/update logic. The same `TemplatePreview` component renders both the live preview in the editor and the real public page, dispatching on `template` (`classic` | `meme_gif` | `teddy_bear`) to `src/components/templates/*Preview.tsx`. Each template receives `config` (copy + `theme`), optional date-planning config, photos and display mode, and `onYesClick` / `onDateFormSubmit` callbacks; in the editor these are no-ops, on the public page they write to Supabase. Themes (`cute`, `minimal`, `dark`, `pastel`, `chaotic`) are defined in `src/types/site.ts`; shared template constants (No-button escalation text, per-theme GIFs) are in `src/components/templates/shared.ts`. Adding a template or theme means touching the selector, `TemplatePreview`, the template components, and the DB value used in `valentine_sites.template`/`theme`.
 
-**Auth**: `AuthContext` wraps the app around the Supabase client (`src/integrations/supabase/client.ts`, PKCE flow, session in localStorage). Owner pages check the session themselves.
+**Auth**: `AuthContext` wraps the app around the Supabase client (`src/integrations/supabase/client.ts`, PKCE flow, session in localStorage). Owner pages check the session themselves: show a spinner while auth loads, `<Navigate to="/auth">` when signed out, then gate queries with `enabled: !!user`.
+
+**Data fetching**: reads go through TanStack Query (`QueryClientProvider` in `App.tsx`; client and keys in `src/lib/queryClient.ts`). Every owner-side key lives under `["sites", …]` (`queryKeys.mySites` / `site` / `siteResponses`), so after any create/edit/delete invalidate `["sites"]` and every owner view refreshes; the public page uses `queryKeys.publicSite(slug)`. `EditSite` loads the row and then mounts `EditSiteForm`, whose form state is initialized once from it, so don't sync query data into state with an effect. Visitor writes on the public page (view/yes inserts, date preferences) are plain fire-and-forget calls.
+
+**Decorative randomness** (floating hearts, confetti) comes from `src/lib/decorations.ts` via a lazy `useState(() => …)` so it's picked once per mount. Calling `Math.random()` during render fails lint and makes elements jump on every re-render. Templates reset their state on theme change by remounting (`key={config.theme}` in `TemplatePreview`), not through an effect.
 
 ## Conventions
 
