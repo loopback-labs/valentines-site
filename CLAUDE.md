@@ -54,7 +54,7 @@ Google Analytics is injected at build time by a Vite plugin only when `VITE_GA_M
 
 **Data fetching**: reads go through TanStack Query (`QueryClientProvider` in `App.tsx`; client and keys in `src/lib/queryClient.ts`). Every owner-side key lives under `["sites", …]` (`queryKeys.mySites` / `site` / `siteResponses`), so after any create/edit/delete invalidate `["sites"]` and every owner view refreshes; the public page uses `queryKeys.publicSite(slug)`. `EditSite` loads the row and then mounts `EditSiteForm`, whose form state is initialized once from it, so don't sync query data into state with an effect. Visitor writes on the public page (view/yes inserts, date preferences) are plain fire-and-forget calls.
 
-**Decorative randomness** (floating hearts, confetti) comes from `src/lib/decorations.ts` via a lazy `useState(() => …)` so it's picked once per mount. Calling `Math.random()` during render fails lint and makes elements jump on every re-render. Templates reset their state on theme change by remounting (`key={config.theme}` in `TemplatePreview`), not through an effect.
+**Decorative randomness** (floating hearts, confetti) comes from `src/lib/decorations.ts` via a lazy `useState(() => …)`. The templates deliberately reshuffle their floating hearts from the "No" handler by setting that state. Calling `Math.random()` during render fails lint and makes elements jump on every re-render. Templates reset their state on theme change by remounting (`key={config.theme}` in `TemplatePreview`), not through an effect.
 
 ## Conventions
 

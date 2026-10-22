@@ -95,7 +95,7 @@ export default function MemeGifPreview({
   const [yesScale, setYesScale] = useState(1);
   const [showSuccess, setShowSuccess] = useState(false);
   const [gifState, setGifState] = useState<"neutral" | "sad" | "happy">("neutral");
-  const [floatingHearts] = useState(() => randomFloatingHearts(12, 12, 20));
+  const [floatingHearts, setFloatingHearts] = useState(() => randomFloatingHearts(12, 12, 20));
 
   const styles = themeStyles[config.theme];
 
@@ -103,6 +103,7 @@ export default function MemeGifPreview({
     setNoIndex((prev) => Math.min(prev + 1, NO_BUTTON_VARIANTS.length - 1));
     setYesScale((prev) => Math.min(prev + 0.15, 2.5));
     setGifState("sad");
+    setFloatingHearts(randomFloatingHearts(12, 12, 20));
   };
 
   const handleYesClick = () => {
