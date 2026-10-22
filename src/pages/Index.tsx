@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Heart, Sparkles, Zap, Share2, BarChart3, Image as ImageIcon } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
