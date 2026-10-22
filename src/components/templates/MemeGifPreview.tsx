@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Heart } from "lucide-react";
 import DatePlanningForm, { DatePreferences } from "@/components/DatePlanningForm";
 import { DatePlanningConfig } from "@/components/TemplatePreview";
@@ -8,6 +8,7 @@ import {
   type PhotoDisplayMode,
 } from "@/components/PhotoUploadConfig";
 import { NEUTRAL_GIFS_BY_THEME, NO_BUTTON_VARIANTS } from "@/components/templates/shared";
+import { randomFloatingHearts } from "@/lib/decorations";
 import type { Theme } from "@/types/site";
 
 interface MemeGifPreviewProps {
@@ -94,6 +95,7 @@ export default function MemeGifPreview({
   const [yesScale, setYesScale] = useState(1);
   const [showSuccess, setShowSuccess] = useState(false);
   const [gifState, setGifState] = useState<"neutral" | "sad" | "happy">("neutral");
+  const [floatingHearts] = useState(() => randomFloatingHearts(12, 12, 20));
 
   const styles = themeStyles[config.theme];
 
@@ -108,14 +110,6 @@ export default function MemeGifPreview({
     setGifState("happy");
     if (onYesClick) onYesClick();
   };
-
-  // Reset on config change (for preview)
-  useEffect(() => {
-    setNoIndex(0);
-    setYesScale(1);
-    setShowSuccess(false);
-    setGifState("neutral");
-  }, [config.theme]);
 
   const showDatePlanningForm = datePlanningConfig?.enableDatePlanning && 
     datePlanningConfig.timeSlots.length > 0;
@@ -188,17 +182,17 @@ export default function MemeGifPreview({
       )}
       {/* Floating Hearts Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(12)].map((_, i) => (
+        {floatingHearts.map((heart, i) => (
           <Heart
             key={i}
             className={`absolute ${heartColors[config.theme]} opacity-20 animate-float`}
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              width: `${12 + Math.random() * 20}px`,
-              height: `${12 + Math.random() * 20}px`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${3 + Math.random() * 2}s`,
+              left: `${heart.left}%`,
+              top: `${heart.top}%`,
+              width: `${heart.size}px`,
+              height: `${heart.size}px`,
+              animationDelay: `${heart.delay}s`,
+              animationDuration: `${heart.duration}s`,
             }}
             fill="currentColor"
           />

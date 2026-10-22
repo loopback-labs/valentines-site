@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Heart } from "lucide-react";
 import DatePlanningForm, { DatePreferences } from "@/components/DatePlanningForm";
 import { DatePlanningConfig } from "@/components/TemplatePreview";
 import { PhotoBackground, PhotoGallery, type PhotoDisplayMode } from "@/components/PhotoUploadConfig";
 import { NO_BUTTON_VARIANTS } from "@/components/templates/shared";
+import { randomConfetti, randomFloatingHearts } from "@/lib/decorations";
 import type { Theme } from "@/types/site";
 
 interface ValentinePreviewProps {
@@ -75,6 +76,8 @@ export default function ValentinePreview({
   const [showSuccess, setShowSuccess] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const noButtonRef = useRef<HTMLButtonElement>(null);
+  const [confetti] = useState(() => randomConfetti(30));
+  const [floatingHearts] = useState(() => randomFloatingHearts(8, 15, 25));
 
   const styles = themeStyles[config.theme];
 
@@ -113,14 +116,6 @@ export default function ValentinePreview({
     if (onYesClick) onYesClick();
   };
 
-  // Reset on config change (for preview)
-  useEffect(() => {
-    setNoIndex(0);
-    setNoPosition({ x: 0, y: 0 });
-    setYesScale(1);
-    setShowSuccess(false);
-  }, [config.theme]);
-
   const showDatePlanningForm = datePlanningConfig?.enableDatePlanning && 
     datePlanningConfig.timeSlots.length > 0;
   
@@ -140,17 +135,15 @@ export default function ValentinePreview({
           <PhotoBackground photos={backgroundPhotos} />
         )}
         {/* Confetti */}
-        {[...Array(30)].map((_, i) => (
+        {confetti.map((piece, i) => (
           <div
             key={i}
             className="absolute w-3 h-3 animate-confetti"
             style={{
-              left: `${Math.random() * 100}%`,
-              backgroundColor: ["#ff69b4", "#ff1493", "#ff6347", "#ffd700", "#9370db"][
-                Math.floor(Math.random() * 5)
-              ],
-              animationDelay: `${Math.random() * 2}s`,
-              borderRadius: Math.random() > 0.5 ? "50%" : "0",
+              left: `${piece.left}%`,
+              backgroundColor: piece.color,
+              animationDelay: `${piece.delay}s`,
+              borderRadius: piece.round ? "50%" : "0",
             }}
           />
         ))}
@@ -200,17 +193,17 @@ export default function ValentinePreview({
       {/* Floating hearts for cute/chaotic themes */}
       {(config.theme === "cute" || config.theme === "chaotic") && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(8)].map((_, i) => (
+          {floatingHearts.map((heart, i) => (
             <Heart
               key={i}
               className={`absolute ${styles.accent} opacity-20 animate-float`}
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                width: `${15 + Math.random() * 25}px`,
-                height: `${15 + Math.random() * 25}px`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${3 + Math.random() * 2}s`,
+                left: `${heart.left}%`,
+                top: `${heart.top}%`,
+                width: `${heart.size}px`,
+                height: `${heart.size}px`,
+                animationDelay: `${heart.delay}s`,
+                animationDuration: `${heart.duration}s`,
               }}
               fill="currentColor"
             />

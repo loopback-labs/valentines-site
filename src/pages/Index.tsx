@@ -1,23 +1,14 @@
-import { useMemo } from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Heart, Sparkles, Zap, Share2, BarChart3, Image as ImageIcon } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { randomFloatingHearts } from "@/lib/decorations";
 
 export default function Index() {
   const { user, loading } = useAuth();
 
-  const floatingHearts = useMemo(
-    () =>
-      Array.from({ length: 20 }, () => ({
-        left: Math.random() * 100,
-        top: Math.random() * 100,
-        size: 20 + Math.random() * 40,
-        delay: Math.random() * 3,
-        duration: 3 + Math.random() * 2,
-      })),
-    [],
-  );
+  const [floatingHearts] = useState(() => randomFloatingHearts(20));
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">

@@ -1,5 +1,5 @@
 import { defineConfig, loadEnv, type Plugin } from "vite";
-import react from "@vitejs/plugin-react-swc";
+import react from "@vitejs/plugin-react";
 import path from "path";
 import { copyFileSync } from "node:fs";
 
@@ -52,7 +52,7 @@ export default defineConfig(({ command, mode }) => {
   ].filter(Boolean),
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": path.resolve(import.meta.dirname, "./src"),
     },
   },
 };

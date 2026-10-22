@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Heart, Loader2 } from "lucide-react";
 import TemplatePreview from "@/components/TemplatePreview";
@@ -8,6 +9,7 @@ import { DatePreferences } from "@/components/DatePlanningForm";
 import { PasswordEntryScreen } from "@/components/PasswordProtection";
 import { PhotoDisplayMode } from "@/components/PhotoUploadConfig";
 import type { Theme } from "@/types/site";
+import { queryKeys } from "@/lib/queryClient";
 
 // SiteData now excludes password_hash - it's never sent to the client
 interface SiteData {
@@ -29,46 +31,55 @@ interface SiteData {
   photo_display_mode: string | null;
 }
 
+async function trackView(siteId: string) {
+  // Insert view response
+  await supabase.from("site_responses").insert({
+    site_id: siteId,
+    response_type: "view",
+  });
+
+  // Increment view count using RPC
+  try {
+    await supabase.rpc("increment_view_count", { site_id: siteId });
+  } catch {
+    // RPC might not exist yet, silently fail
+  }
+}
+
 export default function ValentineSite() {
   const { slug } = useParams<{ slug: string }>();
-  const [site, setSite] = useState<SiteData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false);
-  const [viewTracked, setViewTracked] = useState(false);
-  const [isUnlocked, setIsUnlocked] = useState(false);
+  const viewTracked = useRef(false);
+  const [passwordUnlocked, setPasswordUnlocked] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [checkingPassword, setCheckingPassword] = useState(false);
 
+  const siteQuery = useQuery({
+    queryKey: queryKeys.publicSite(slug),
+    enabled: !!slug,
+    staleTime: Infinity,
+    queryFn: async () => {
+      // Use the public view which excludes sensitive columns like password_hash
+      const { data, error } = await supabase
+        .from("valentine_sites_public")
+        .select("*")
+        .eq("slug", slug!)
+        .maybeSingle();
+      if (error) throw error;
+      return data as SiteData | null;
+    },
+  });
+  const site = siteQuery.data ?? null;
+  const loading = siteQuery.isPending;
+  const notFound = !site && (siteQuery.isError || siteQuery.isSuccess);
+  const isUnlocked = !!site && (!site.password_protected || passwordUnlocked);
+
+  // Track view immediately for non-protected sites
   useEffect(() => {
-    if (slug) {
-      fetchSite();
+    if (site && !site.password_protected && !viewTracked.current) {
+      viewTracked.current = true;
+      void trackView(site.id);
     }
-  }, [slug]);
-
-  const fetchSite = async () => {
-    // Use the public view which excludes sensitive columns like password_hash
-    const { data, error } = await supabase
-      .from("valentine_sites_public")
-      .select("*")
-      .eq("slug", slug)
-      .maybeSingle();
-
-    if (error || !data) {
-      setNotFound(true);
-    } else {
-      setSite(data as SiteData);
-      // If not password protected, auto-unlock
-      if (!data.password_protected) {
-        setIsUnlocked(true);
-        // Track view immediately for non-protected sites
-        if (!viewTracked) {
-          trackView(data.id);
-          setViewTracked(true);
-        }
-      }
-    }
-    setLoading(false);
-  };
+  }, [site]);
 
   const handlePasswordSubmit = async (enteredPassword: string) => {
     if (!site) return;
@@ -91,11 +102,11 @@ export default function ValentineSite() {
       }
 
       if (data?.valid) {
-        setIsUnlocked(true);
+        setPasswordUnlocked(true);
         // Track view after successful unlock
-        if (!viewTracked) {
-          trackView(site.id);
-          setViewTracked(true);
+        if (!viewTracked.current) {
+          viewTracked.current = true;
+          void trackView(site.id);
         }
       } else {
         setPasswordError("Incorrect password. Please try again.");
@@ -106,21 +117,6 @@ export default function ValentineSite() {
     }
     
     setCheckingPassword(false);
-  };
-
-  const trackView = async (siteId: string) => {
-    // Insert view response
-    await supabase.from("site_responses").insert({
-      site_id: siteId,
-      response_type: "view",
-    });
-
-    // Increment view count using RPC
-    try {
-      await supabase.rpc("increment_view_count", { site_id: siteId });
-    } catch {
-      // RPC might not exist yet, silently fail
-    }
   };
 
   const handleYesClick = async () => {

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Heart } from "lucide-react";
@@ -16,6 +17,7 @@ import {
 export default function CreateSite() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
   const [slugError, setSlugError] = useState("");
   const [datePlanningOpen, setDatePlanningOpen] = useState(false);
@@ -134,6 +136,7 @@ export default function CreateSite() {
       if (publish) {
         await supabase.functions.invoke("cleanup-stale-photos");
       }
+      void queryClient.invalidateQueries({ queryKey: ["sites"] });
       toast.success(publish ? "Site published! 🎉" : "Site saved as draft");
       navigate("/dashboard");
     }
