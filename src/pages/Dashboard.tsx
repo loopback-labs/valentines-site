@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Navigate, Link } from "react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { THEME_EMOJIS, type Theme } from "@/types/site";
+import { queryKeys } from "@/lib/queryClient";
 interface ValentineSite {
   id: string;
   slug: string;
@@ -39,42 +41,52 @@ interface ValentineSite {
 }
 export default function Dashboard() {
   const { user, loading, signOut } = useAuth();
-  const [sites, setSites] = useState<ValentineSite[]>([]);
-  const [loadingSites, setLoadingSites] = useState(true);
+  const queryClient = useQueryClient();
+  const sitesQuery = useQuery({
+    queryKey: queryKeys.mySites(user?.id),
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("valentine_sites")
+        .select("*")
+        .eq("user_id", user!.id)
+        .order("created_at", {
+          ascending: false,
+        });
+      if (error) throw error;
+      return data;
+    },
+  });
+  const sites: ValentineSite[] = sitesQuery.data ?? [];
+  const loadingSites = sitesQuery.isPending;
   useEffect(() => {
-    if (user) {
-      fetchSites();
-    }
-  }, [user]);
-  const fetchSites = async () => {
-    const { data, error } = await supabase
-      .from("valentine_sites")
-      .select("*")
-      .eq("user_id", user!.id)
-      .order("created_at", {
-        ascending: false,
-      });
-    if (error) {
+    if (sitesQuery.error) {
       toast.error("Failed to load your sites");
-      console.error(error);
-    } else {
-      setSites(data || []);
+      console.error(sitesQuery.error);
     }
-    setLoadingSites(false);
-  };
+  }, [sitesQuery.error]);
   const handleSignOut = async () => {
     await signOut();
     toast.success("See you soon! 💕");
   };
-  const deleteSite = async (siteId: string) => {
-    const { error } = await supabase.from("valentine_sites").delete().eq("id", siteId);
-    if (error) {
-      toast.error("Failed to delete site");
-    } else {
+  const deleteSite = useMutation({
+    mutationFn: async (siteId: string) => {
+      const { error } = await supabase.from("valentine_sites").delete().eq("id", siteId);
+      if (error) throw error;
+      return siteId;
+    },
+    onSuccess: (siteId) => {
       toast.success("Site deleted");
-      setSites((prev) => prev.filter((s) => s.id !== siteId));
-    }
-  };
+      queryClient.setQueryData<ValentineSite[]>(queryKeys.mySites(user?.id), (prev) =>
+        prev?.filter((s) => s.id !== siteId),
+      );
+      queryClient.removeQueries({ queryKey: queryKeys.site(siteId) });
+      queryClient.removeQueries({ queryKey: queryKeys.siteResponses(siteId) });
+    },
+    onError: () => {
+      toast.error("Failed to delete site");
+    },
+  });
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -324,7 +336,8 @@ export default function Dashboard() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => deleteSite(site.id)}
+                      onClick={() => deleteSite.mutate(site.id)}
+                      disabled={deleteSite.isPending && deleteSite.variables === site.id}
                       className="text-destructive hover:text-destructive"
                     >
                       <Trash2 className="w-4 h-4" />

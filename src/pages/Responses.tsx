@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Navigate, Link, useParams } from "react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -15,94 +16,67 @@ import {
 import { Heart, ArrowLeft, Calendar, Clock, Utensils, Sparkles, Eye, MousePointerClick } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { queryKeys } from "@/lib/queryClient";
 
-interface DatePreference {
-  id: string;
-  selected_date: string;
-  selected_time: string;
-  food_preference: string;
-  activity_preference: string;
-  created_at: string;
-}
+async function fetchResponses(siteId: string, userId: string) {
+  const { data: site, error: siteError } = await supabase
+    .from("valentine_sites")
+    .select("id, headline, slug, view_count, yes_count")
+    .eq("id", siteId)
+    .eq("user_id", userId)
+    .maybeSingle();
 
-interface SiteResponse {
-  id: string;
-  response_type: string;
-  created_at: string;
-}
+  if (siteError) throw siteError;
+  if (!site) {
+    return { site: null, datePreferences: [], responses: [] };
+  }
 
-interface SiteInfo {
-  id: string;
-  headline: string;
-  slug: string;
-  view_count: number;
-  yes_count: number;
+  const [prefsResult, respResult] = await Promise.all([
+    supabase
+      .from("date_preferences")
+      .select("*")
+      .eq("site_id", siteId)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("site_responses")
+      .select("*")
+      .eq("site_id", siteId)
+      .order("created_at", { ascending: false })
+      .limit(50),
+  ]);
+
+  if (prefsResult.error) {
+    console.error("Error fetching preferences:", prefsResult.error);
+  }
+  if (respResult.error) {
+    console.error("Error fetching responses:", respResult.error);
+  }
+
+  return {
+    site,
+    datePreferences: prefsResult.data ?? [],
+    responses: respResult.data ?? [],
+  };
 }
 
 export default function Responses() {
   const { id } = useParams<{ id: string }>();
   const { user, loading } = useAuth();
-  const [site, setSite] = useState<SiteInfo | null>(null);
-  const [datePreferences, setDatePreferences] = useState<DatePreference[]>([]);
-  const [responses, setResponses] = useState<SiteResponse[]>([]);
-  const [loadingData, setLoadingData] = useState(true);
-
-  const fetchData = async () => {
-    const uid = user?.id;
-    if (!uid || !id) {
-      setLoadingData(false);
-      return;
-    }
-
-    const { data: siteData, error: siteError } = await supabase
-      .from("valentine_sites")
-      .select("id, headline, slug, view_count, yes_count")
-      .eq("id", id)
-      .eq("user_id", uid)
-      .maybeSingle();
-
-    if (siteError || !siteData) {
-      toast.error("Site not found");
-      setLoadingData(false);
-      return;
-    }
-
-    setSite(siteData);
-
-    const [prefsResult, respResult] = await Promise.all([
-      supabase
-        .from("date_preferences")
-        .select("*")
-        .eq("site_id", id)
-        .order("created_at", { ascending: false }),
-      supabase
-        .from("site_responses")
-        .select("*")
-        .eq("site_id", id)
-        .order("created_at", { ascending: false })
-        .limit(50),
-    ]);
-
-    if (prefsResult.error) {
-      console.error("Error fetching preferences:", prefsResult.error);
-    } else {
-      setDatePreferences(prefsResult.data || []);
-    }
-
-    if (respResult.error) {
-      console.error("Error fetching responses:", respResult.error);
-    } else {
-      setResponses(respResult.data || []);
-    }
-
-    setLoadingData(false);
-  };
+  const responsesQuery = useQuery({
+    queryKey: queryKeys.siteResponses(id),
+    enabled: !!user && !!id,
+    queryFn: async () => fetchResponses(id!, user!.id),
+  });
+  const site = responsesQuery.data?.site ?? null;
+  const datePreferences = responsesQuery.data?.datePreferences ?? [];
+  const responses = responsesQuery.data?.responses ?? [];
+  const loadingData = responsesQuery.isPending;
 
   useEffect(() => {
-    if (user && id) {
-      fetchData();
+    if (responsesQuery.isError || responsesQuery.data?.site === null) {
+      toast.error("Site not found");
     }
-  }, [user, id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [responsesQuery.isError, responsesQuery.data?.site]);
 
   if (loading) {
     return (
