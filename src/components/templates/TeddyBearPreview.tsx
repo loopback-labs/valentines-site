@@ -7,6 +7,7 @@ import {
   type PhotoDisplayMode,
 } from "@/components/PhotoUploadConfig";
 import { NEUTRAL_GIFS_BY_THEME, NO_BUTTON_VARIANTS } from "@/components/templates/shared";
+import { randomFloatingHearts, randomRisingHearts } from "@/lib/decorations";
 import type { Theme } from "@/types/site";
 
 interface TeddyBearPreviewProps {
@@ -107,6 +108,8 @@ export default function TeddyBearPreview({
   const [isHoveringNo, setIsHoveringNo] = useState(false);
   const [currentHappyGif, setCurrentHappyGif] = useState(0);
   const [floatingSadGifs, setFloatingSadGifs] = useState<Array<{ id: number; gif: string; x: number; y: number }>>([]);
+  const [risingHearts] = useState(() => randomRisingHearts(15));
+  const [floatingHearts] = useState(() => randomFloatingHearts(8));
 
   const styles = themeStyles[config.theme];
   const holoClass = holoThemes[config.theme];
@@ -149,14 +152,6 @@ export default function TeddyBearPreview({
       return () => clearTimeout(timeout);
     }
   }, [floatingSadGifs]);
-
-  // Reset on config change
-  useEffect(() => {
-    setNoIndex(0);
-    setYesScale(1);
-    setShowSuccess(false);
-    setFloatingSadGifs([]);
-  }, [config.theme]);
 
   const showDatePlanningForm = datePlanningConfig?.enableDatePlanning && 
     datePlanningConfig.timeSlots.length > 0;
@@ -218,17 +213,17 @@ export default function TeddyBearPreview({
         </div>
 
         {/* Floating hearts */}
-        {[...Array(15)].map((_, i) => (
+        {risingHearts.map((heart, i) => (
           <div
             key={i}
             className="absolute text-2xl animate-float-up"
             style={{
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 2}s`,
-              animationDuration: `${2 + Math.random() * 2}s`,
+              left: `${heart.left}%`,
+              animationDelay: `${heart.delay}s`,
+              animationDuration: `${heart.duration}s`,
             }}
           >
-            {["💕", "💖", "💗", "💓", "💝"][Math.floor(Math.random() * 5)]}
+            {heart.emoji}
           </div>
         ))}
       </div>
@@ -308,15 +303,15 @@ export default function TeddyBearPreview({
       </div>
 
       {/* Background floating hearts */}
-      {[...Array(8)].map((_, i) => (
+      {floatingHearts.map((heart, i) => (
         <div
           key={i}
           className="absolute text-3xl opacity-30 animate-float pointer-events-none"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            animationDelay: `${Math.random() * 3}s`,
-            animationDuration: `${3 + Math.random() * 2}s`,
+            left: `${heart.left}%`,
+            top: `${heart.top}%`,
+            animationDelay: `${heart.delay}s`,
+            animationDuration: `${heart.duration}s`,
           }}
         >
           💕

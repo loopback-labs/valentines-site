@@ -44,7 +44,8 @@ export default function TemplatePreview({
     case "meme_gif":
       return (
         <MemeGifPreview 
-          config={config} 
+          key={config.theme}
+          config={config}
           datePlanningConfig={datePlanningConfig}
           backgroundPhotos={backgroundPhotos}
           photoDisplayMode={photoDisplayMode}
@@ -55,7 +56,8 @@ export default function TemplatePreview({
     case "teddy_bear":
       return (
         <TeddyBearPreview 
-          config={config} 
+          key={config.theme}
+          config={config}
           datePlanningConfig={datePlanningConfig}
           backgroundPhotos={backgroundPhotos}
           photoDisplayMode={photoDisplayMode}
@@ -67,7 +69,8 @@ export default function TemplatePreview({
     default:
       return (
         <ClassicPreview 
-          config={config} 
+          key={config.theme}
+          config={config}
           datePlanningConfig={datePlanningConfig}
           backgroundPhotos={backgroundPhotos}
           photoDisplayMode={photoDisplayMode}

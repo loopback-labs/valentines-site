@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Heart, Sparkles, Mail, Lock, User } from "lucide-react";
 import { toast } from "sonner";
+import { randomFloatingHearts } from "@/lib/decorations";
 
 function GoogleIcon() {
   return (
@@ -77,17 +78,7 @@ export default function Auth() {
   const [signupPassword, setSignupPassword] = useState("");
   const [signupName, setSignupName] = useState("");
 
-  const floatingHearts = useMemo(
-    () =>
-      Array.from({ length: 15 }, () => ({
-        left: Math.random() * 100,
-        top: Math.random() * 100,
-        size: 20 + Math.random() * 40,
-        delay: Math.random() * 3,
-        duration: 3 + Math.random() * 2,
-      })),
-    [],
-  );
+  const [floatingHearts] = useState(() => randomFloatingHearts(15));
 
   useEffect(() => {
     if (loading || user || location.pathname !== "/auth/callback") return;

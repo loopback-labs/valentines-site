@@ -52,7 +52,7 @@ export default defineConfig(({ command, mode }) => {
   ].filter(Boolean),
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": path.resolve(import.meta.dirname, "./src"),
     },
   },
 };
